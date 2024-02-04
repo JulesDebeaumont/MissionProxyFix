@@ -1,0 +1,19 @@
+namespace MissionDevBack.Db;
+
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using MissionDevBack.Models;
+
+public sealed class MissionDevContext : IdentityDbContext<User>
+{
+    public MissionDevContext(DbContextOptions<MissionDevContext> options) : base(options)
+    {
+    }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+    }
+
+    public DbSet<Project> Projects { get; set; }
+}
