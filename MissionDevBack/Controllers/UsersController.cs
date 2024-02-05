@@ -1,10 +1,9 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MissionDevBack.Db;
 using MissionDevBack.Models;
+using MissionDevBack.Services;
 
 namespace MissionDevBack.Controllers
 {
@@ -13,10 +12,12 @@ namespace MissionDevBack.Controllers
     public class UsersController : ControllerBase
     {
         private readonly MissionDevContext _context;
+        private readonly FileStorageService _storageService;
 
-        public UsersController(MissionDevContext context)
+        public UsersController(MissionDevContext context, FileStorageService storageService)
         {
             _context = context;
+            _storageService = storageService;
         }
 
         // GET: api/Users
@@ -103,6 +104,26 @@ namespace MissionDevBack.Controllers
         public async Task<IActionResult> TestUser()
         {
             return Ok(User.Identity.IsAuthenticated);
+        }
+
+        [HttpPost("yeah")]
+        public async Task<IActionResult> TestUploadFile(List<IFormFile> files)
+        {
+            if (files.Count == 0)
+            {
+                return BadRequest();
+            }
+            foreach (var file in files) {
+                var responseWriteFile = await _storageService.WriteUserFileToDiskAsync(file, User.Identity.Name);
+                foreach (var errorFile in responseWriteFile.Errors)
+                {
+                    ModelState.AddModelError("File", errorFile);
+                }
+            }
+            if (ModelState.ErrorCount > 0) {
+                return BadRequest(ModelState.Values);
+            }
+            return Ok();
         }
 
         private bool UserExists(string id)

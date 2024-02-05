@@ -19,6 +19,7 @@ builder.Services.AddDbContext<MissionDevContext>(options =>
         options.UseNpgsql(builder.Configuration["MissionDevDbCredentials"]));
 
 builder.Services.AddTransient<AuthService>();
+builder.Services.AddTransient<FileStorageService>();
 
 builder.Services.AddIdentityCore<User>()
             .AddEntityFrameworkStores<MissionDevContext>()
@@ -81,7 +82,8 @@ void CheckAllUsedSecrets(IConfiguration config)
     var secretsToCheck = new string[]
     {
         "MissionDevDbCredentials",
-        "MissionDevJwtPrivateKey"
+        "MissionDevJwtPrivateKey",
+        "MissionDevPathMainStorage"
     };
     foreach (string secret in secretsToCheck)
     {

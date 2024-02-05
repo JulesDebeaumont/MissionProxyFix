@@ -36,6 +36,9 @@ async function testEndPoint2() {
   const responseUser = await api.get('users/adjime');
   test2.value = responseUser.data;
 }
+async function factoryFn() {
+  await api.post('users/yeah');
+}
 </script>
 
 <template>
@@ -80,6 +83,12 @@ async function testEndPoint2() {
 
         <q-btn @click="testEndPoint2" label="test" />
         {{ test2 }}
+
+        <q-uploader
+          label="Upload"
+          :factory="factoryFn"
+          style="max-width: 300px"
+        />
         <EssentialLink
           v-for="project in projects"
           :key="project.ID"

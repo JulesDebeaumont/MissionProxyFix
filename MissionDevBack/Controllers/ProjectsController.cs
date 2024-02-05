@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MissionDevBack.Db;
@@ -43,7 +42,7 @@ namespace MissionDevBack.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProject(int id, Project project)
         {
-            if (id != project.ID)
+            if (id != project.Id)
             {
                 return BadRequest();
             }
@@ -77,7 +76,7 @@ namespace MissionDevBack.Controllers
             _context.Projects.Add(project);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProject", new { id = project.ID }, project);
+            return CreatedAtAction("GetProject", new { id = project.Id }, project);
         }
 
         // DELETE: api/Projects/5
@@ -98,7 +97,7 @@ namespace MissionDevBack.Controllers
 
         private bool ProjectExists(int id)
         {
-            return _context.Projects.Any(e => e.ID == id);
+            return _context.Projects.Any(e => e.Id == id);
         }
     }
 }
