@@ -105,39 +105,56 @@ public class FileStorageService
         return storageResponse;
     }
 
-    public FileStorageServiceResponse EraseFileFromDisk()
+    public FileStorageServiceResponse EraseFileFromDisk(string tempFilename)
     {
         var storageResponse = new FileStorageServiceResponse();
-
+        if (File.Exists(tempFilename))
+        {
+            File.Delete(tempFilename);
+            storageResponse.IsSuccess = true;
+        }
+        else
+        {
+            storageResponse.Errors.Add("File does not exist");
+        }
         return storageResponse;
     }
 
-    public FileStorageServiceResponse GetFileFromDisk()
+    public async Task<FileStorageServiceResponse> GetFileFromDiskAsync(string tempFilename)
     {
         var storageResponse = new FileStorageServiceResponse();
-
+        if (File.Exists(tempFilename))
+        {
+            var fileBytes = await File.ReadAllBytesAsync(tempFilename);
+            storageResponse.IsSuccess = true;
+            storageResponse.FileBytes = fileBytes;
+        }
+        else
+        {
+            storageResponse.Errors.Add("File does not exist");
+        }
         return storageResponse;
     }
-    
+
     private string GetMainPathStorage()
     {
         return _config["MissionDevPathMainStorage"];
     }
-    
+
     private static class UserFileOptions
     {
         public readonly static string UserFileFolder = "UserFile";
         public readonly static string[] PermittedExtensions = [".pdf", ".csv", ".docx"];
         public readonly static long MaxFileLength = 5L * 1024L * 1024L; // 5Mb
     }
-    
+
     private static class ProjectFileOptions
     {
         public readonly static string ProjectFileFolder = "ProjectFile";
         public readonly static string[] PermittedExtensions = [".pdf", ".csv", ".docx", ".png", ".jpeg", ".jpg"];
         public readonly static long MaxFileLength = 5L * 1024L * 1024L; // 5Mb
     }
-    
+
     private static class GlobalFileOption
     {
         public readonly static long MaxFileLength = 5L * 1024L * 1024L; // 5Mb
