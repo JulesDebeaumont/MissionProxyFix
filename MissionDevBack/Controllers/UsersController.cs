@@ -109,22 +109,43 @@ namespace MissionDevBack.Controllers
         [HttpPost("yeah")]
         public async Task<IActionResult> TestUploadFile(List<IFormFile> files)
         {
-            
             if (files.Count == 0)
             {
                 return BadRequest();
             }
             foreach (var file in files) {
-                var responseWriteFile = await _storageService.WriteUserFileToDiskAsync(file, User.Identity.Name);
+                var responseWriteFile = await _storageService.WriteUserFileToStorageAsync(file, User.Identity.Name);
                 foreach (var errorFile in responseWriteFile.Errors)
                 {
                     ModelState.AddModelError("File", errorFile);
                 }
             }
-            if (ModelState.ErrorCount > 0) {
-                return BadRequest(ModelState.Values);
+            if (!ModelState.IsValid) {
+                return BadRequest(ModelState.Values.SelectMany(value => value.Errors).ToList());
             }
             return Ok();
+        }
+
+        [HttpPost("oula")]
+        public async Task<IActionResult> TestGet(List<IFormFile> files)
+        {
+            if (files.Count == 0)
+            {
+                return BadRequest();
+            }
+            var meta = "";
+            foreach (var file in files) {
+                var responseWriteFile = await _storageService.WriteUserFileToStorageAsync(file, User.Identity.Name);
+                foreach (var errorFile in responseWriteFile.Errors)
+                {
+                    ModelState.AddModelError("File", errorFile);
+                }
+                meta = responseWriteFile.RelativePathFromStorage;
+            }
+            if (!ModelState.IsValid) {
+                return BadRequest(ModelState.Values.SelectMany(value => value.Errors).ToList());
+            }
+            return Ok(meta);
         }
 
         private bool UserExists(string id)

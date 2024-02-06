@@ -174,7 +174,7 @@ public class AuthService
 
     private static DateTime GetJwtExpiration()
     {
-        return DateTime.UtcNow.AddHours(8);
+        return DateTime.Now.AddHours(8);
     }
 
     private static SymmetricSecurityKey GetSymmetricJwtSecurityKey(IConfiguration config)

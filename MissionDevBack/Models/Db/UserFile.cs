@@ -10,7 +10,7 @@ public class UserFile
     public string Filename { get; set; }
     
     [Required]
-    public string TempFilename { get; set; }
+    public string StorageFilename { get; set; }
     
     [Required]
     public DateTime CreatedAt { get; set; }

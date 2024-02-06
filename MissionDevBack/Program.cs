@@ -13,7 +13,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-CheckAllUsedSecrets(builder.Configuration);
+EnsureSecretsAreDefined(builder.Configuration);
+FileStorageService.EnsureStorageDirectoryAreCreated(builder.Configuration);
 
 builder.Services.AddDbContext<MissionDevContext>(options =>
         options.UseNpgsql(builder.Configuration["MissionDevDbCredentials"]));
@@ -47,7 +48,11 @@ builder.Services.AddCors(options =>
         });
     });
 
+
+
 var app = builder.Build();
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 if (app.Environment.IsDevelopment())
 {
@@ -77,7 +82,7 @@ app.MapControllers();
 app.Run();
 
 
-void CheckAllUsedSecrets(IConfiguration config)
+void EnsureSecretsAreDefined(IConfiguration config)
 {
     var secretsToCheck = new string[]
     {
@@ -89,7 +94,7 @@ void CheckAllUsedSecrets(IConfiguration config)
     {
         if (config[secret] is null)
         {
-            throw new Exception($"{secret} is not defined !");
+            throw new Exception($"Secret {secret} is not defined !");
         }
     }
 }

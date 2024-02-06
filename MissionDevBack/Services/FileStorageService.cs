@@ -14,23 +14,22 @@ public class FileStorageService
         _dbContext = dbContext;
     }
 
-    public async Task<FileStorageServiceResponse> WriteFileToDiskAsync(FormFile formfile)
+    public async Task<FileStorageEditFileResponse> WriteFileToStorageAsync(IFormFile formfile, string relativePath)
     {
-        var storageResponse = new FileStorageServiceResponse();
-        var filePath = Path.Combine(GetMainPathStorage(), Path.GetRandomFileName());
+        var storageResponse = new FileStorageEditFileResponse();
+        var filePath = Path.Combine(GetMainPathStorage(_config), relativePath);
         using (var stream = File.Create(filePath))
         {
             await formfile.CopyToAsync(stream);
         }
         storageResponse.IsSuccess = true;
+        storageResponse.RelativePathFromStorage = relativePath;
         return storageResponse;
     }
 
-    public async Task<FileStorageServiceResponse> WriteUserFileToDiskAsync(IFormFile formfile, string userId)
+    public async Task<FileStorageEditFileResponse> WriteUserFileToStorageAsync(IFormFile formfile, string userId)
     {
-        var storageResponse = new FileStorageServiceResponse();
-        Console.WriteLine("ICI");
-        Console.WriteLine(formfile.Length);
+        var storageResponse = new FileStorageEditFileResponse();
         if (formfile.Length == 0)
         {
             storageResponse.Errors.Add("File is tempty");
@@ -46,30 +45,28 @@ public class FileStorageService
             storageResponse.Errors.Add($"File is too big ( size > {UserFileOptions.MaxFileLength})");
             return storageResponse;
         }
-        var fileTempFilename = Path.GetTempFileName();
-        var filePath = Path.Combine(GetMainPathStorage(), UserFileOptions.UserFileFolder, fileTempFilename);
-        using (var stream = File.Create(filePath))
+        var randomFilename = Path.GetRandomFileName();
+        var relativePath = Path.Combine(UserFileOptions.Folder, randomFilename);
+        var responseWrite = await WriteFileToStorageAsync(formfile, relativePath);
+        if (!responseWrite.IsSuccess)
         {
-            Console.WriteLine(stream.Length);
-            await formfile.CopyToAsync(stream);
+            return responseWrite;
         }
         var userFile = new UserFile()
         {
             UserId = userId,
-            Filename = formfile.FileName,
-            TempFilename = fileTempFilename,
+            Filename = Path.GetFileName(formfile.FileName),
+            StorageFilename = randomFilename,
             CreatedAt = DateTime.Now
         };
         _dbContext.UserFiles.Add(userFile);
         await _dbContext.SaveChangesAsync();
-
-        storageResponse.IsSuccess = true;
-        return storageResponse;
+        return responseWrite;
     }
 
-    public async Task<FileStorageServiceResponse> WriteProjectFileToDiskAsync(IFormFile formfile, int projectId)
+    public async Task<FileStorageEditFileResponse> WriteProjectFileToStorageAsync(IFormFile formfile, int projectId)
     {
-        var storageResponse = new FileStorageServiceResponse();
+        var storageResponse = new FileStorageEditFileResponse();
         if (formfile.Length == 0)
         {
             storageResponse.Errors.Add("File is tempty");
@@ -85,78 +82,121 @@ public class FileStorageService
             storageResponse.Errors.Add($"File is too big ( size > {ProjectFileOptions.MaxFileLength})");
             return storageResponse;
         }
-        var fileTempFilename = Path.GetTempFileName();
-        var filePath = Path.Combine(GetMainPathStorage(), ProjectFileOptions.ProjectFileFolder, fileTempFilename);
-        using (var stream = File.Create(filePath))
+        var randomFilename = Path.GetRandomFileName();
+        var relativePath = Path.Combine(ProjectFileOptions.Folder, randomFilename);
+        var responseWrite = await WriteFileToStorageAsync(formfile, relativePath);
+        if (!responseWrite.IsSuccess)
         {
-            await formfile.CopyToAsync(stream);
+            return responseWrite;
         }
-        var projectFile = new ProjectFile()
+        var projectfile = new ProjectFile()
         {
             ProjectId = projectId,
-            Filename = formfile.FileName,
-            TempFilename = fileTempFilename,
+            Filename = Path.GetFileName(formfile.FileName),
+            StorageFilename = randomFilename,
             CreatedAt = DateTime.Now
         };
-        _dbContext.ProjectFiles.Add(projectFile);
+        _dbContext.ProjectFiles.Add(projectfile);
         await _dbContext.SaveChangesAsync();
+        return responseWrite;
+    }
 
+    public FileStorageEditFileResponse EraseFileFromStorage(string fileRelativePath)
+    {
+        var storageResponse = new FileStorageEditFileResponse();
+        var filePath = Path.Combine(GetMainPathStorage(_config), fileRelativePath);
+        if (!File.Exists(filePath))
+        {
+            storageResponse.Errors.Add("File does not exist");
+            return storageResponse;
+        }
+        File.Delete(filePath);
         storageResponse.IsSuccess = true;
         return storageResponse;
     }
 
-    public FileStorageServiceResponse EraseFileFromDisk(string tempFilename)
+    public FileStorageEditFileResponse EraseUserFileFromStorage(UserFile userFile)
     {
-        var storageResponse = new FileStorageServiceResponse();
-        if (File.Exists(tempFilename))
+        var relativePathInStorage = Path.Combine(UserFileOptions.Folder, userFile.StorageFilename);
+        var responseEraseFile = EraseFileFromStorage(relativePathInStorage);
+        if (!responseEraseFile.IsSuccess)
         {
-            File.Delete(tempFilename);
-            storageResponse.IsSuccess = true;
+            return responseEraseFile;
         }
-        else
+        _dbContext.UserFiles.Remove(userFile);
+        _dbContext.SaveChanges();
+        return responseEraseFile;
+    }
+
+    public FileStorageEditFileResponse EraseProjectFileFromStorage(ProjectFile projectFile)
+    {
+        var relativePathInStorage = Path.Combine(ProjectFileOptions.Folder, projectFile.StorageFilename);
+        var responseEraseFile = EraseFileFromStorage(relativePathInStorage);
+        if (!responseEraseFile.IsSuccess)
+        {
+            return responseEraseFile;
+        }
+        _dbContext.ProjectFiles.Remove(projectFile);
+        _dbContext.SaveChanges();
+        return responseEraseFile;
+    }
+
+    public async Task<FileStorageGetFileResponse> GetFileFromStorageAsync(string fileRelativePath)
+    {
+        var storageResponse = new FileStorageGetFileResponse();
+        var filePath = Path.Combine(GetMainPathStorage(_config), fileRelativePath);
+        if (!File.Exists(filePath))
         {
             storageResponse.Errors.Add("File does not exist");
+            return storageResponse;
         }
+        storageResponse.IsSuccess = true;
+        storageResponse.FileBytes = await File.ReadAllBytesAsync(filePath);
         return storageResponse;
     }
 
-    public async Task<FileStorageServiceResponse> GetFileFromDiskAsync(string tempFilename)
+    public async Task<FileStorageGetFileResponse> GetUserFileFromStorageAsync(UserFile userfile)
     {
-        var storageResponse = new FileStorageServiceResponse();
-        if (File.Exists(tempFilename))
-        {
-            var fileBytes = await File.ReadAllBytesAsync(tempFilename);
-            storageResponse.IsSuccess = true;
-            storageResponse.FileBytes = fileBytes;
-        }
-        else
-        {
-            storageResponse.Errors.Add("File does not exist");
-        }
-        return storageResponse;
+        var relativePathInStorage = Path.Combine(UserFileOptions.Folder, userfile.StorageFilename);
+        var getFileResponse = await GetFileFromStorageAsync(relativePathInStorage);
+        return getFileResponse;
     }
 
-    private string GetMainPathStorage()
+    public async Task<FileStorageGetFileResponse> GetProjectFileFromStorageAsync(UserFile projectFile)
     {
-        return _config["MissionDevPathMainStorage"];
+        var relativePathInStorage = Path.Combine(ProjectFileOptions.Folder, projectFile.StorageFilename);
+        var getFileResponse = await GetFileFromStorageAsync(relativePathInStorage);
+        return getFileResponse;
+    }
+
+    private static string GetMainPathStorage(IConfiguration config)
+    {
+        return config["MissionDevPathMainStorage"];
+    }
+
+    public static void EnsureStorageDirectoryAreCreated(IConfiguration config)
+    {
+        var storageFolders = new List<string>() {
+            UserFileOptions.Folder,
+            ProjectFileOptions.Folder
+        };
+        foreach (var folder in storageFolders)
+        {
+            Directory.CreateDirectory(Path.Combine(GetMainPathStorage(config), folder));
+        }
     }
 
     private static class UserFileOptions
     {
-        public readonly static string UserFileFolder = "UserFile";
-        public readonly static string[] PermittedExtensions = [".pdf", ".csv", ".docx"];
+        public readonly static string Folder = "UserFile";
+        public readonly static string[] PermittedExtensions = [".pdf", ".csv", ".docx", ".json"];
         public readonly static long MaxFileLength = 5L * 1024L * 1024L; // 5Mb
     }
 
     private static class ProjectFileOptions
     {
-        public readonly static string ProjectFileFolder = "ProjectFile";
+        public readonly static string Folder = "ProjectFile";
         public readonly static string[] PermittedExtensions = [".pdf", ".csv", ".docx", ".png", ".jpeg", ".jpg"];
-        public readonly static long MaxFileLength = 5L * 1024L * 1024L; // 5Mb
-    }
-
-    private static class GlobalFileOption
-    {
         public readonly static long MaxFileLength = 5L * 1024L * 1024L; // 5Mb
     }
 }

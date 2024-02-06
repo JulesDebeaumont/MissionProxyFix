@@ -6,7 +6,7 @@ public class ProjectFile
 
     public string Filename { get; set; }
 
-    public string TempFilename { get; set; }
+    public string StorageFilename { get; set; }
 
     public DateTime CreatedAt { get; set; }
 

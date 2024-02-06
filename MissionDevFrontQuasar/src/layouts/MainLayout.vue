@@ -16,6 +16,7 @@ const leftDrawerOpen = ref(false);
 const projects = ref<IProject[]>([]);
 const test = ref();
 const test2 = ref();
+const uploadFileRed = ref();
 
 // functions
 function toggleLeftDrawer() {
@@ -35,6 +36,13 @@ async function testEndPoint() {
 async function testEndPoint2() {
   const responseUser = await api.get('users/adjime');
   test2.value = responseUser.data;
+}
+async function testEndPoint3() {
+  const formData = new FormData();
+  formData.append('files', uploadFileRed.value);
+  await api.post('users/yeah', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
 }
 </script>
 
@@ -81,11 +89,15 @@ async function testEndPoint2() {
         <q-btn @click="testEndPoint2" label="test" />
         {{ test2 }}
 
-        <q-uploader
-          url="https://localhost:7037/api/users/yeah"
-          label="Upload"
-          style="max-width: 300px"
+        <q-file
+          clearable
+          filled
+          color="purple-12"
+          v-model="uploadFileRed"
+          label="Label"
         />
+        <q-btn @click="testEndPoint3" label="test" />
+
         <EssentialLink
           v-for="project in projects"
           :key="project.ID"
