@@ -91,6 +91,7 @@ public class AuthService
         identityUser.RefreshTokenExpiry = GetJwtExpiration();
 
         await _userManager.UpdateAsync(identityUser);
+        
         return response;
     }
 

@@ -4,6 +4,7 @@ import { useUserStore } from 'src/stores/user-store';
 import { useRouter } from 'vue-router';
 import { IProject } from 'src/components/models';
 import { api } from 'src/boot/axios';
+import { exportFile } from 'quasar';
 // components
 import EssentialLink from 'src/components/EssentialLink.vue';
 
@@ -26,23 +27,30 @@ function logout() {
   userStore.purge();
   router.push({ name: 'login' });
 }
-async function testEndPoint() {
+async function testGetRefreshToken() {
   const responseUser = await api.post('refresh-token', {
     Jwt: userStore.getJwtInCookie(),
     RefreshToken: userStore.getRefreshTokenInCookie(),
   });
   test.value = responseUser.data;
 }
-async function testEndPoint2() {
+async function testPolicy() {
   const responseUser = await api.get('users/adjime');
   test2.value = responseUser.data;
 }
-async function testEndPoint3() {
+async function testUpload() {
   const formData = new FormData();
   formData.append('files', uploadFileRed.value);
   await api.post('users/yeah', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
+}
+async function testDownload() {
+  const file = (await api.post('users/oula2/10')).data;
+  exportFile('sdfsdf.json', file);
+}
+async function testEraseFile() {
+  await api.post('users/oula3/10');
 }
 </script>
 
@@ -83,10 +91,10 @@ async function testEndPoint3() {
       <q-list>
         <q-item-label header> Projects </q-item-label>
         <pre>{{ userStore.test() }}</pre>
-        <q-btn @click="testEndPoint" label="test" />
+        <q-btn @click="testGetRefreshToken" label="Refresh token" />
         {{ test }}
 
-        <q-btn @click="testEndPoint2" label="test" />
+        <q-btn @click="testPolicy" label="Policy" />
         {{ test2 }}
 
         <q-file
@@ -96,8 +104,9 @@ async function testEndPoint3() {
           v-model="uploadFileRed"
           label="Label"
         />
-        <q-btn @click="testEndPoint3" label="test" />
-
+        <q-btn @click="testUpload" label="upload" />
+        <q-btn @click="testDownload" label="download" />
+        <q-btn @click="testEraseFile" label="erase filee" />
         <EssentialLink
           v-for="project in projects"
           :key="project.ID"
