@@ -87,13 +87,13 @@ namespace MissionDevBack.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var User = await _context.Users.FindAsync(id);
-            if (User == null)
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
             {
                 return NotFound();
             }
 
-            _context.Users.Remove(User);
+            _context.Users.Remove(user);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -126,26 +126,38 @@ namespace MissionDevBack.Controllers
             return Ok();
         }
 
-        [HttpPost("oula")]
-        public async Task<IActionResult> TestGet(List<IFormFile> files)
+        [HttpPost("oula2/{userFileId}")]
+        public async Task<IActionResult> TestEncore(int userFileId)
         {
-            if (files.Count == 0)
+            var userFile = await _context.UserFiles.FindAsync(userFileId);
+            if (userFile == null)
             {
-                return BadRequest();
+                return NotFound();
             }
-            var meta = "";
-            foreach (var file in files) {
-                var responseWriteFile = await _storageService.WriteUserFileToStorageAsync(file, User.Identity.Name);
-                foreach (var errorFile in responseWriteFile.Errors)
-                {
-                    ModelState.AddModelError("File", errorFile);
-                }
-                meta = responseWriteFile.RelativePathFromStorage;
+            var file = await _storageService.GetUserFileFromStorageAsync(userFile);
+            if (!file.IsSuccess)
+            {
+                return NotFound();
             }
-            if (!ModelState.IsValid) {
-                return BadRequest(ModelState.Values.SelectMany(value => value.Errors).ToList());
+            
+            return File(file.FileBytes, userFile.MimeType);
+        }
+
+        [HttpPost("oula3/{userFileId}")]
+        public async Task<IActionResult> TestEncorze(int userFileId)
+        {
+            var userFile = await _context.UserFiles.FindAsync(userFileId);
+            if (userFile == null)
+            {
+                return NotFound();
             }
-            return Ok(meta);
+            var file = _storageService.EraseUserFileFromStorage(userFile);
+            if (!file.IsSuccess)
+            {
+                return NotFound();
+            }
+            
+            return Ok();
         }
 
         private bool UserExists(string id)

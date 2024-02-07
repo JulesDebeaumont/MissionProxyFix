@@ -11,4 +11,6 @@ public class FileStorageEditFileResponse
     public List<string> Errors { get; set; } = [];
 
     public string RelativePathFromStorage { get; set; }
+
+    public int ResourceId { get; set; }
 }

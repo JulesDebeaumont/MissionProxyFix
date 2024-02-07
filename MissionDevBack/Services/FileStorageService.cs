@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.StaticFiles;
 using MissionDevBack.Db;
 using MissionDevBack.Models;
 
@@ -46,6 +47,7 @@ public class FileStorageService
             return storageResponse;
         }
         var randomFilename = Path.GetRandomFileName();
+        var mimeType = formfile.ContentType;
         var relativePath = Path.Combine(UserFileOptions.Folder, randomFilename);
         var responseWrite = await WriteFileToStorageAsync(formfile, relativePath);
         if (!responseWrite.IsSuccess)
@@ -57,10 +59,15 @@ public class FileStorageService
             UserId = userId,
             Filename = Path.GetFileName(formfile.FileName),
             StorageFilename = randomFilename,
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.Now,
         };
+        if (mimeType != null)
+        {
+            userFile.MimeType = mimeType;
+        }
         _dbContext.UserFiles.Add(userFile);
         await _dbContext.SaveChangesAsync();
+        responseWrite.ResourceId = userFile.Id;
         return responseWrite;
     }
 
@@ -83,6 +90,7 @@ public class FileStorageService
             return storageResponse;
         }
         var randomFilename = Path.GetRandomFileName();
+        var mimeType = formfile.ContentType;
         var relativePath = Path.Combine(ProjectFileOptions.Folder, randomFilename);
         var responseWrite = await WriteFileToStorageAsync(formfile, relativePath);
         if (!responseWrite.IsSuccess)
@@ -94,10 +102,15 @@ public class FileStorageService
             ProjectId = projectId,
             Filename = Path.GetFileName(formfile.FileName),
             StorageFilename = randomFilename,
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.Now,
         };
+        if (mimeType != null)
+        {
+            projectfile.MimeType = mimeType;
+        }
         _dbContext.ProjectFiles.Add(projectfile);
         await _dbContext.SaveChangesAsync();
+        responseWrite.ResourceId = projectfile.Id;
         return responseWrite;
     }
 

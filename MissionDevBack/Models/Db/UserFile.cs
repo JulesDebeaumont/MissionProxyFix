@@ -11,6 +11,9 @@ public class UserFile
     
     [Required]
     public string StorageFilename { get; set; }
+
+    [Required]
+    public string MimeType { get; set; } = "application/octet-stream";
     
     [Required]
     public DateTime CreatedAt { get; set; }
