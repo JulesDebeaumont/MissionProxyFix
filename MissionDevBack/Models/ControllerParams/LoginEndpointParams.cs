@@ -4,8 +4,14 @@ namespace MissionDevBack.Models.ControllerParams;
 
 public class LoginEndpointParams {
     [Required]
-    public string username { get; set;}
+    public string Username { get; set;}
 
     [Required]
-    public string password { get; set;}
+    public string Password { get; set;}
+
+    // [Required]
+    // public string CasTicket { get; set;}
+
+    // [Required]
+    // public string Service { get; set;}
 }

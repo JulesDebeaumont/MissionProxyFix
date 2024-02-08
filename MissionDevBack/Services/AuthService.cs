@@ -57,6 +57,44 @@ public class AuthService
         return loginResponse;
     }
 
+    public async Task<AuthServiceResponseJwt> GenerateUserJwt(User user)
+    {
+        var loginResponse = new AuthServiceResponseJwt
+        {
+            EncodedJwtToken = GenerateTokenString(user),
+            RefreshToken = GenerateRefreshTokenString()
+        };
+        user.RefreshToken = loginResponse.RefreshToken;
+        user.RefreshTokenExpiry = GetJwtExpiration();
+        await _userManager.UpdateAsync(user);
+        return loginResponse;
+    }
+
+    public async Task<AuthServiceResponseUser> CreateOrUpdateUserFromNoyauSih(NoyauSihUser noyauUser)
+    {
+        var loginResponse = new AuthServiceResponseUser();
+        var userProperties = new User()
+        {
+            IdRes = noyauUser.id_res,
+            Email = noyauUser.courriel,
+            // Roles = noyauUser.profils
+        };
+        var user = await _userManager.FindByIdAsync(userProperties.IdRes);
+        if (user == null)
+        {
+            await _userManager.CreateAsync(userProperties);
+            loginResponse.User = userProperties;
+        }
+        else
+        {
+            userProperties.Id = user.Id;
+            await _userManager.UpdateAsync(userProperties);
+            loginResponse.User = user;
+        }
+        loginResponse.IsSuccess = true;
+        return loginResponse;
+    }
+
     public async Task<AuthServiceResponse> RefreshToken(string jwt, string refreshToken)
     {
         var response = new AuthServiceResponse();
@@ -91,7 +129,7 @@ public class AuthService
         identityUser.RefreshTokenExpiry = GetJwtExpiration();
 
         await _userManager.UpdateAsync(identityUser);
-        
+
         return response;
     }
 
