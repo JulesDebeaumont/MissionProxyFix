@@ -18,9 +18,15 @@ namespace MissionDevBack.Controllers
 
         // GET: api/Projects
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Project>>> GetProjects()
+        public async Task<ActionResult<IEnumerable<Project>>> GetProjects([FromQuery]ProjectIndexEndpointParams projectIndexParams)
         {
-            return await _context.Projects.ToListAsync();
+            if (projectIndexParams.limit > 20)
+            {
+                projectIndexParams.limit = 20;
+            }
+            var rowCount = _context.Projects.Count();
+            var projects = await _context.Projects.Skip(projectIndexParams.offset).Take(projectIndexParams.limit).ToListAsync();
+            return Ok(new { rowCount, projects });
         }
 
         // GET: api/Projects/5

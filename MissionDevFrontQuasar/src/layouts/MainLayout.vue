@@ -2,30 +2,26 @@
 import { ref } from 'vue';
 import { useUserStore } from 'src/stores/user-store';
 import { useRouter } from 'vue-router';
-import { IProject } from 'src/components/models';
 import { api } from 'src/boot/axios';
 import { exportFile } from 'quasar';
 // components
-import EssentialLink from 'src/components/EssentialLink.vue';
+import SideBarMenu from 'src/components/layout/SideBarMenu.vue';
+import AccountMenu from 'src/components/layout/AccountMenu.vue';
+import ApplicationTitle from 'src/components/layout/ApplicationTitle.vue';
 
 // consts
 const userStore = useUserStore();
 const router = useRouter();
 
 // refs
-const leftDrawerOpen = ref(false);
-const projects = ref<IProject[]>([]);
 const test = ref();
 const test2 = ref();
 const uploadFileRed = ref();
+const leftDrawer = ref(true);
 
 // functions
 function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value;
-}
-function logout() {
-  userStore.purge();
-  router.push({ name: 'login' });
+  leftDrawer.value = !leftDrawer.value;
 }
 async function testGetRefreshToken() {
   const responseUser = await api.post('refresh-token', {
@@ -52,31 +48,55 @@ async function testDownload() {
 async function testEraseFile() {
   await api.post('users/oula3/10');
 }
+function logout() {
+  userStore.clear();
+  router.push({ name: 'login' });
+}
 </script>
 
 <template>
-  <q-layout view="hHh lpR fFf">
-    <q-header elevated>
-      <q-toolbar>
+  <q-layout view="hHh Lpr lff">
+    <q-header class="bg-accent" height-hint="64" elevated>
+      <q-toolbar class="GPL__toolbar" style="height: 64px">
         <q-btn
+          @click="toggleLeftDrawer"
+          :disable="!userStore.isUserConnected"
           flat
           dense
           round
           icon="menu"
           aria-label="Menu"
-          @click="toggleLeftDrawer"
+          class="q-mx-md"
         />
+        <q-toolbar-title
+          v-if="$q.screen.gt.sm"
+          shrink
+          class="row items-center no-wrap"
+        >
+          <ApplicationTitle class="q-pt-sm" />
+        </q-toolbar-title>
 
-        <q-toolbar-title> Mission Dev </q-toolbar-title>
+        <q-space />
 
         <div class="q-gutter-sm row items-center no-wrap">
           <q-btn-dropdown :disable="!userStore.isUserConnected" round flat>
             <template v-slot:label>
-              <q-avatar size="26px" icon="person" color="secondary" />
+              <q-avatar size="26px" icon="person" color="primary" />
             </template>
 
             <q-list>
+              <q-item>
+                <q-item-section>
+                  {{ userStore.userFullName }}
+                </q-item-section>
+              </q-item>
+
+              <q-separator />
+
               <q-item clickable v-close-popup @click="logout()">
+                <q-item-section avatar>
+                  <q-icon name="logout" />
+                </q-item-section>
                 <q-item-section>
                   <q-item-label>Déconnexion</q-item-label>
                 </q-item-section>
@@ -87,8 +107,24 @@ async function testEraseFile() {
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list>
+    <q-drawer
+      v-if="userStore.isUserConnected"
+      v-model="leftDrawer"
+      bordered
+      :width="230"
+      :breakpoint="500"
+      show-if-above
+      class="bg-accent"
+    >
+      <div class="flex flex-center column full-height">
+        <q-list
+          class="flex justify-start items-center column no-wrap q-gutter-y-md full-height"
+        >
+          <SideBarMenu />
+        </q-list>
+      </div>
+
+      <!-- <q-list>
         <q-item-label header> Projects </q-item-label>
         <pre>{{ userStore.test() }}</pre>
         <q-btn @click="testGetRefreshToken" label="Refresh token" />
@@ -112,7 +148,7 @@ async function testEraseFile() {
           :key="project.ID"
           :project="project"
         />
-      </q-list>
+      </q-list> -->
     </q-drawer>
 
     <q-page-container>

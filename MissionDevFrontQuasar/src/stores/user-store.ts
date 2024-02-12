@@ -42,7 +42,7 @@ export const useUserStore = defineStore('user', {
       const refreshToken: string = Cookies.get(COOKIE_JWT_REFRESH);
       this.setupUserInStore(token, refreshToken);
     },
-    purge() {
+    clear() {
       this.userId = null;
       this.userFullName = null;
       this.roles = [];

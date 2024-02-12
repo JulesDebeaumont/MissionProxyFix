@@ -1,5 +1,8 @@
 import { RouteRecordRaw } from 'vue-router';
-import { gateIsUserAuthenticated, gateIsUserNotAuthenticated } from 'src/router/gates';
+import {
+  gateIsUserAuthenticated,
+  gateIsUserNotAuthenticated,
+} from 'src/router/gates';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -11,16 +14,42 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'root',
-    redirect: { name: 'dashboard'}
+    redirect: { name: 'dashboard' },
   },
   {
     path: '/dashboard',
     name: 'dashboard',
+    redirect: { name: 'my-projects' },
     beforeEnter: gateIsUserAuthenticated,
-    component: () => import('pages/DashboardPage.vue'),
+    children: [
+      {
+        path: 'projects',
+        children: [
+          {
+            path: 'my-projects',
+            name: 'my-projects',
+            component: () => import('pages/project/UserProjectPage.vue'),
+          },
+          {
+            path: 'project/:projectId',
+            name: 'project-show',
+            component: () => import('pages/project/ProjectPage.vue'),
+          },
+          {
+            path: 'project-edit/:projectId',
+            name: 'project-edit',
+            component: () => import('pages/project/ProjectEditPage.vue'),
+          },
+          {
+            path: 'project-create',
+            name: 'project-create',
+            component: () => import('pages/project/ProjectEditPage.vue'),
+          },
+        ],
+      },
+    ],
   },
 
-  
   {
     path: '/error401',
     name: 'error401',

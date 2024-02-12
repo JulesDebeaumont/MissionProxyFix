@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MissionDevBack.Db;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MissionDevBack.Migrations
 {
     [DbContext(typeof(MissionDevContext))]
-    partial class MissionDevContextModelSnapshot : ModelSnapshot
+    [Migration("20240211153608_AddIdResToUser")]
+    partial class AddIdResToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -168,14 +171,16 @@ namespace MissionDevBack.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<int>("State")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Projects");
                 });
@@ -327,21 +332,6 @@ namespace MissionDevBack.Migrations
                     b.ToTable("UserFiles");
                 });
 
-            modelBuilder.Entity("ProjectUser", b =>
-                {
-                    b.Property<int>("ProjectsId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("UsersId")
-                        .HasColumnType("text");
-
-                    b.HasKey("ProjectsId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("ProjectUser");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -393,6 +383,13 @@ namespace MissionDevBack.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("MissionDevBack.Models.Project", b =>
+                {
+                    b.HasOne("MissionDevBack.Models.User", null)
+                        .WithMany("Projects")
+                        .HasForeignKey("UserId");
+                });
+
             modelBuilder.Entity("MissionDevBack.Models.ProjectFile", b =>
                 {
                     b.HasOne("MissionDevBack.Models.Project", "Project")
@@ -415,19 +412,9 @@ namespace MissionDevBack.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ProjectUser", b =>
+            modelBuilder.Entity("MissionDevBack.Models.User", b =>
                 {
-                    b.HasOne("MissionDevBack.Models.Project", null)
-                        .WithMany()
-                        .HasForeignKey("ProjectsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MissionDevBack.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Projects");
                 });
 #pragma warning restore 612, 618
         }

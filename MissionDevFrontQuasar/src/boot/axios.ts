@@ -1,5 +1,6 @@
 import { boot } from 'quasar/wrappers';
 import { useUserStore } from 'src/stores/user-store';
+import { Notify } from 'quasar';
 import axios, { AxiosInstance } from 'axios';
 
 declare module '@vue/runtime-core' {
@@ -28,7 +29,7 @@ export default boot(({ router }) => {
     function (config) {
       if (userStore.isUserConnected) {
         if (userStore.tokenExpire === true) {
-          userStore.purge();
+          userStore.clear();
           return config;
         }
         config.headers.Authorization = `Bearer ${userStore.getJwtInCookie()}`;
@@ -48,12 +49,19 @@ export default boot(({ router }) => {
     function (error) {
       console.error(error);
       if (error.response?.status === 401) {
-        userStore.purge();
+        userStore.clear();
         router.push({ name: ROUTE_NAME_LOGIN });
         return;
       }
       if (error.response?.status === 403) {
         router.push({ name: ROUTE_NAME_ERROR403 });
+        return;
+      }
+      if (error.response?.status === 500) {
+        Notify.create({
+          type: 'negative',
+          message: 'Une erreur est survenue',
+        });
         return;
       }
     }

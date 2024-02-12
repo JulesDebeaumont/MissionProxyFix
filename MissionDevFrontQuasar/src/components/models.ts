@@ -1,20 +1,23 @@
 export type TRole = 'ADMIN' | 'WORKER';
 
 export interface ITokenDecode {
-  UserId: IUser['Id'];
-  UserFullname: IUser['Fullname'];
-  UserRoles: IUser['Roles'];
+  UserId: IUser['id'];
+  UserFullname: IUser['fullname'];
+  UserRoles: IUser['roles'];
   exp: number;
 }
 
 export interface IUser {
-  Id: string;
-  Fullname: string;
-  Roles: TRole[];
+  id: string;
+  idres: string;
+  fullname: string;
+  roles: TRole[];
 }
 
 export interface IProject {
-  ID: number;
-  Title: string;
-  Description: string;
+  id: number;
+  title: string;
+  description: string;
+  state: number;
+  deadline: string;
 }

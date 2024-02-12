@@ -20,7 +20,9 @@ builder.Services.AddDbContext<MissionDevContext>(options =>
         options.UseNpgsql(builder.Configuration["MissionDevDbCredentials"]));
 
 builder.Services.AddTransient<AuthService>();
+builder.Services.AddTransient<NoyauSihService>();
 builder.Services.AddTransient<FileStorageService>();
+builder.Services.AddTransient<ZimbraService>();
 
 builder.Services.AddIdentityCore<User>()
             .AddEntityFrameworkStores<MissionDevContext>()

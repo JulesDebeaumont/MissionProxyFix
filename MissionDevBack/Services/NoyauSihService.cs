@@ -14,17 +14,20 @@ public class NoyauSihService
         var responseServiceNoyau = new NoyauServiceResponseCas();
         try
         {
-            using HttpClient client = new();
-            var responseCas = await client.GetAsync($"{CasUrl}/validate?service={service}&ticket={ticket}");
-            responseCas.EnsureSuccessStatusCode();
-            var responseCasArray = responseCas.Content.ToString().Split("\n");
-            if (responseCasArray.First() != ResponseCasOk)
+            using (var client = new HttpClient())
             {
-                responseServiceNoyau.Errors.Add("CAS did not authorize");
-                return responseServiceNoyau;
+                var responseCas = await client.GetAsync($"{CasUrl}/validate?service={service}&ticket={ticket}");
+                responseCas.EnsureSuccessStatusCode();
+                var responseCasArray = responseCas.Content.ToString().Split("\n");
+                if (responseCasArray.First() != ResponseCasOk)
+                {
+                    responseServiceNoyau.Errors.Add("CAS did not authorize");
+                    return responseServiceNoyau;
+                }
+                responseServiceNoyau.IsSuccess = true;
+                responseServiceNoyau.UserIdRes = responseCasArray.Last();
             }
-            responseServiceNoyau.IsSuccess = true;
-            responseServiceNoyau.UserIdRes = responseCasArray.Last();
+
             return responseServiceNoyau;
         }
         catch (Exception exception)
@@ -33,16 +36,19 @@ public class NoyauSihService
             return responseServiceNoyau;
         }
     }
-    
+
     async public Task<NoyauServiceResponseUser> GetUserFromNoyauSih(string userIdRes)
     {
         var responseServiceNoyau = new NoyauServiceResponseUser();
         try
         {
-            using HttpClient client = new();
-            var responseNoyau = await client.GetAsync($"{NoyauSihUrl}/iam{userIdRes}/{ApplicationCI}/habilitations.json");
-            responseNoyau.EnsureSuccessStatusCode();
-            responseServiceNoyau.NoyauSihUser = await responseNoyau.Content.ReadFromJsonAsync<NoyauSihUser>();
+            using (var client = new HttpClient())
+            {
+                var responseNoyau = await client.GetAsync($"{NoyauSihUrl}/iam{userIdRes}/{ApplicationCI}/habilitations.json");
+                responseNoyau.EnsureSuccessStatusCode();
+                responseServiceNoyau.NoyauSihUser = await responseNoyau.Content.ReadFromJsonAsync<NoyauSihUser>();
+            }
+
             responseServiceNoyau.IsSuccess = true;
             return responseServiceNoyau;
         }

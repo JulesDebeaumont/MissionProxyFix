@@ -1,5 +1,6 @@
 namespace MissionDevBack.Db;
 
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,12 +17,15 @@ public static class MissionDevSeed
 
         // Users
         context.Users.ExecuteDelete();
+        var user1 = new User() { Fullname = "Jules Debeaumont", UserName = "JulesD", IdRes = "", Roles = [EUserRoles.Admin, EUserRoles.Worker] };
+        var user2 = new User() { Fullname = "Brian Bertili", UserName = "BrianB", IdRes = "", Roles = [EUserRoles.Worker] };
         var users = new User[]
            {
-                new() {Fullname="Jules Debeaumont", UserName="didier", Roles=[EnumRoles.Admin]},
-                new() {Fullname="Brian Bertili", UserName="didierbis", Roles=[EnumRoles.Worker]}
+                user1,
+                user2
            };
-        foreach (User user in users) {
+        foreach (User user in users)
+        {
             var password = "_SuperDidier1234_";
             await userManager.CreateAsync(user, password);
         }
@@ -30,10 +34,11 @@ public static class MissionDevSeed
         context.Projects.ExecuteDelete();
         var projects = new Project[]
            {
-                new() {Title="Flammèche"},
-                new() {Title="Site de l'IIAS"},
-                new() {Title="Pascomacte"},
-                new() {Title="Astre"},
+                new() {Title="Astre", Deadline= new DateTime(2023, 8, 1), Users = [user1], State = EProjectState.Done },
+                new() {Title="Site de l'IIAS", Deadline= new DateTime(2023, 5, 1), Users = users, State = EProjectState.Done },
+                new() {Title="Flammèche", Deadline= new DateTime(2024, 6, 1), Users = [user1], State = EProjectState.Started },
+                new() {Title="Pascomacte", Users = [user2], State = EProjectState.Pending },
+                new() {Title="Intranet", Deadline= new DateTime(2023, 2, 22), Users = users, State = EProjectState.Started },
            };
         await context.Projects.AddRangeAsync(projects);
 

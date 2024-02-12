@@ -29,28 +29,28 @@ namespace MissionDevBack.Controllers
             return BadRequest();
         }
 
-        // [HttpPost("login")]
-        // public async Task<ActionResult> Login(LoginEndpointParams loginEndPointParams)
-        // {
+        [HttpPost("login-cas")]
+        public async Task<ActionResult> LoginCas(LoginEndpointCasParams loginEndPointParams)
+        {
 
-        //     var noyauServiceResponseCas = await _noyauService.VerifyTicketFromCas(LoginEndpointParams.CasTicket, LoginEndpointParams.Service);
-        //     if (!noyauServiceResponseCas.IsSuccess || noyauServiceResponse.UserIdRes == null) 
-        //     {
-        //         return Unauthorized();
-        //     }
-        //     var noyauServiceReponseUser = await _noyauService.GetUserFromNoyauSih(noyauServiceResponse.UserIdRes);
-        //     if (!noyauServiceReponseUser.IsSuccess) 
-        //     {
-        //         return Unauthorized();
-        //     }
-        //     var authServiceResponseUser = await _authService.CreateOrUpdateUserFromNoyauSih(noyauServiceReponseUser.NoyauSihUser);
-        //     if (!authServiceResponseUser.IsSuccess) 
-        //     {
-        //         return BadRequest(authServiceResponseUser.Errors);
-        //     }
-        //     var authServiceResponseJwt = _authService.GenerateUserJwt(authServiceResponseUser.User);
-        //     return Ok(authServiceResponseJwt);
-        // }
+            var noyauServiceResponseCas = await _noyauService.VerifyTicketFromCas(loginEndPointParams.CasTicket, loginEndPointParams.Service);
+            if (!noyauServiceResponseCas.IsSuccess || noyauServiceResponseCas.UserIdRes == null) 
+            {
+                return Unauthorized();
+            }
+            var noyauServiceReponseUser = await _noyauService.GetUserFromNoyauSih(noyauServiceResponseCas.UserIdRes);
+            if (!noyauServiceReponseUser.IsSuccess) 
+            {
+                return Unauthorized();
+            }
+            var authServiceResponseUser = await _authService.CreateOrUpdateUserFromNoyauSih(noyauServiceReponseUser.NoyauSihUser);
+            if (!authServiceResponseUser.IsSuccess) 
+            {
+                return BadRequest(authServiceResponseUser.Errors);
+            }
+            var authServiceResponseJwt = _authService.GenerateUserJwt(authServiceResponseUser.User);
+            return Ok(authServiceResponseJwt);
+        }
 
         // GET: api/refresh-token
         [HttpPost("refresh-token")]

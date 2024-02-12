@@ -21,12 +21,19 @@ async function login() {
 </script>
 
 <template>
-  <q-page class="row items-center justify-evenly">
-    <q-form @submit="login()">
-      <q-input v-model="username" label="Pseudo" />
-      <q-input v-model="passwordLoginForm" label="Mot de passe" />
+  <q-page>
+    <div class="flex flex-center column q-pt-xl">
+      <h6 class="no-margin q-py-md">
+        Vous devez être connecté pour accéder aux fonctionnalités de
+        <i>Mission Proxy Fix</i>
+      </h6>
 
-      <q-btn label="Connexion" type="submit" />
-    </q-form>
+      <div class="flex flex-center column q-gutter-y-sm q-py-md">
+        <q-input v-model="username" filled label="Email" />
+        <q-input v-model="passwordLoginForm" filled label="Mot de passe" />
+      </div>
+
+      <q-btn color="primary" label="Connexion" @click="login" />
+    </div>
   </q-page>
 </template>
