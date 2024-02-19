@@ -4,7 +4,7 @@ import { api } from 'src/boot/axios';
 import { IProject } from 'src/components/models';
 import { QTableProps, useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
-import { dateFormat } from 'src/utils/datetime';
+import { dateFormatDDMMYYYY } from 'src/utils/datetime';
 import {
   displayProjectState,
   getColorClassByProjectState,
@@ -182,7 +182,11 @@ onMounted(async () => {
             </q-chip>
           </q-td>
           <q-td key="deadline">
-            {{ props.row.deadline ? dateFormat(props.row.deadline) : '???' }}
+            {{
+              props.row.deadline
+                ? dateFormatDDMMYYYY(props.row.deadline)
+                : '???'
+            }}
           </q-td>
           <q-td key="users">
             <q-chip

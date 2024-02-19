@@ -32,7 +32,7 @@ export default boot(({ router }) => {
           userStore.clear();
           return config;
         }
-        config.headers.Authorization = `Bearer ${userStore.getJwtInCookie()}`;
+        config.headers.Authorization = `Bearer ${userStore.getJwtInCookie}`;
       }
       return config;
     },

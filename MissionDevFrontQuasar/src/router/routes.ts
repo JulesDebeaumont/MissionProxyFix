@@ -31,17 +31,17 @@ const routes: RouteRecordRaw[] = [
             component: () => import('pages/project/UserProjectPage.vue'),
           },
           {
-            path: 'project/:projectId',
+            path: ':projectId',
             name: 'project-show',
             component: () => import('pages/project/ProjectPage.vue'),
           },
           {
-            path: 'project-edit/:projectId',
+            path: 'edit/:projectId',
             name: 'project-edit',
             component: () => import('pages/project/ProjectEditPage.vue'),
           },
           {
-            path: 'project-create',
+            path: 'create',
             name: 'project-create',
             component: () => import('pages/project/ProjectEditPage.vue'),
           },

@@ -8,7 +8,7 @@ const userStore = useUserStore();
 const router = useRouter();
 
 // refs
-const username = ref<string | null>('didier');
+const username = ref<string | null>('JulesD');
 const passwordLoginForm = ref<string | null>('_SuperDidier1234_');
 
 // function

@@ -6,7 +6,6 @@ import { api } from 'src/boot/axios';
 import { exportFile } from 'quasar';
 // components
 import SideBarMenu from 'src/components/layout/SideBarMenu.vue';
-import AccountMenu from 'src/components/layout/AccountMenu.vue';
 import ApplicationTitle from 'src/components/layout/ApplicationTitle.vue';
 
 // consts
@@ -25,8 +24,8 @@ function toggleLeftDrawer() {
 }
 async function testGetRefreshToken() {
   const responseUser = await api.post('refresh-token', {
-    Jwt: userStore.getJwtInCookie(),
-    RefreshToken: userStore.getRefreshTokenInCookie(),
+    Jwt: userStore.getJwtInCookie,
+    RefreshToken: userStore.getRefreshTokenInCookie,
   });
   test.value = responseUser.data;
 }
@@ -68,11 +67,7 @@ function logout() {
           aria-label="Menu"
           class="q-mx-md"
         />
-        <q-toolbar-title
-          v-if="$q.screen.gt.sm"
-          shrink
-          class="row items-center no-wrap"
-        >
+        <q-toolbar-title shrink class="row items-center no-wrap">
           <ApplicationTitle class="q-pt-sm" />
         </q-toolbar-title>
 

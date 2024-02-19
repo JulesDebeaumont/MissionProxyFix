@@ -6,15 +6,17 @@ import jwt_decode from 'jwt-decode';
 
 const COOKIE_JWT = 'mission-dev-jwt';
 const COOKIE_JWT_REFRESH = 'mission-dev-refresh-token';
+const COOKIE_ZIMBRA_AUTH_TOKEN = 'mission-dev-zimbra-auth-token';
 const SAME_SITE = 'Strict';
 const COOKIE_PATH = '/';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    userId: <IUser['Id'] | null>null,
-    userFullName: <IUser['Fullname'] | null>null,
-    roles: <IUser['Roles']>[],
+    userId: <IUser['id'] | null>null,
+    userFullName: <IUser['fullname'] | null>null,
+    roles: <IUser['roles']>[],
     tokenExpirationTimestamp: <number | null>null,
+    hasZimbraAuthToken: <boolean>false,
   }),
   getters: {
     tokenExpire(): boolean {
@@ -26,10 +28,14 @@ export const useUserStore = defineStore('user', {
     isUserConnected(): boolean {
       return this.userId !== null;
     },
-  },
-  actions: {
-    tokenInCookie(): boolean {
+    jwtInCookie(): boolean {
       return Cookies.has(COOKIE_JWT);
+    },
+    refreshTokenInCookie(): boolean {
+      return Cookies.has(COOKIE_JWT_REFRESH);
+    },
+    zimbraAuthTokenInCookie(): boolean {
+      return Cookies.has(COOKIE_ZIMBRA_AUTH_TOKEN);
     },
     getJwtInCookie(): string {
       return Cookies.get(COOKIE_JWT);
@@ -37,18 +43,36 @@ export const useUserStore = defineStore('user', {
     getRefreshTokenInCookie(): string {
       return Cookies.get(COOKIE_JWT_REFRESH);
     },
+    getZimbraAuthTokenInCookie(): string {
+      return Cookies.get(COOKIE_ZIMBRA_AUTH_TOKEN);
+    },
+  },
+  actions: {
     setupUserFromJwtInCookies() {
       const token: string = Cookies.get(COOKIE_JWT);
       const refreshToken: string = Cookies.get(COOKIE_JWT_REFRESH);
       this.setupUserInStore(token, refreshToken);
+    },
+    setupZimbraAuthToken(csrfToken: string) {
+      Cookies.set(COOKIE_ZIMBRA_AUTH_TOKEN, csrfToken, {
+        sameSite: SAME_SITE,
+        path: COOKIE_PATH,
+      });
+      this.hasZimbraAuthToken = true;
     },
     clear() {
       this.userId = null;
       this.userFullName = null;
       this.roles = [];
       this.tokenExpirationTimestamp = null;
+      this.hasZimbraAuthToken = false;
       Cookies.remove(COOKIE_JWT, { path: COOKIE_PATH });
       Cookies.remove(COOKIE_JWT_REFRESH, { path: COOKIE_PATH });
+      Cookies.remove(COOKIE_ZIMBRA_AUTH_TOKEN, { path: COOKIE_PATH });
+    },
+    logoutZimbra() {
+      Cookies.remove(COOKIE_ZIMBRA_AUTH_TOKEN, { path: COOKIE_PATH });
+      this.hasZimbraAuthToken = false;
     },
     setupUserInStore(token: string, refreshToken: string) {
       const tokenDecode = jwt_decode(token) as ITokenDecode;
@@ -75,12 +99,6 @@ export const useUserStore = defineStore('user', {
       } catch (error: any) {
         console.error(error);
       }
-    },
-    test(): string {
-      if (Cookies.get(COOKIE_JWT)) {
-        return jwt_decode(Cookies.get(COOKIE_JWT));
-      }
-      return 'osdfgosdf';
     },
   },
 });
