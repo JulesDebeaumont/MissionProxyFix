@@ -5,6 +5,7 @@ import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 // components
 import ZimbraTab from 'src/components/project/ZimbraTab.vue';
+import SketchTab from 'src/components/project/sketch/SketchTab.vue';
 
 // consts
 const route = useRoute();
@@ -33,6 +34,7 @@ onMounted(async () => {
     <div>
       <pre>{{ projectRef }}</pre>
       <ZimbraTab :project-id="projectId" />
+      <SketchTab :project-id="projectId" />
     </div>
 
     <div v-show="isLoading" class="flex flex-center">

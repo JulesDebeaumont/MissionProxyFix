@@ -146,7 +146,7 @@ function logout() {
       </q-list> -->
     </q-drawer>
 
-    <q-page-container>
+    <q-page-container class="bg-grey">
       <router-view />
     </q-page-container>
   </q-layout>
