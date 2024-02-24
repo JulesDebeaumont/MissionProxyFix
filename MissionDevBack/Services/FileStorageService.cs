@@ -1,6 +1,6 @@
-using Microsoft.AspNetCore.StaticFiles;
 using MissionDevBack.Db;
 using MissionDevBack.Models;
+using MimeTypes;
 
 namespace MissionDevBack.Services;
 
@@ -47,7 +47,7 @@ public class FileStorageService
             return storageResponse;
         }
         var randomFilename = Path.GetRandomFileName();
-        var mimeType = formfile.ContentType;
+        var mimeType = MimeTypeMap.GetMimeType(formfile.FileName);
         var relativePath = Path.Combine(UserFileOptions.Folder, randomFilename);
         var responseWrite = await WriteFileToStorageAsync(formfile, relativePath);
         if (!responseWrite.IsSuccess)
@@ -60,11 +60,8 @@ public class FileStorageService
             Filename = Path.GetFileName(formfile.FileName),
             StorageFilename = randomFilename,
             CreatedAt = DateTime.Now,
+            MimeType = mimeType
         };
-        if (mimeType != null)
-        {
-            userFile.MimeType = mimeType;
-        }
         _dbContext.UserFiles.Add(userFile);
         await _dbContext.SaveChangesAsync();
         responseWrite.ResourceId = userFile.Id;
@@ -90,7 +87,7 @@ public class FileStorageService
             return storageResponse;
         }
         var randomFilename = Path.GetRandomFileName();
-        var mimeType = formfile.ContentType;
+        var mimeType = MimeTypeMap.GetMimeType(formfile.FileName);
         var relativePath = Path.Combine(ProjectFileOptions.Folder, randomFilename);
         var responseWrite = await WriteFileToStorageAsync(formfile, relativePath);
         if (!responseWrite.IsSuccess)
@@ -103,11 +100,8 @@ public class FileStorageService
             Filename = Path.GetFileName(formfile.FileName),
             StorageFilename = randomFilename,
             CreatedAt = DateTime.Now,
+            MimeType = mimeType
         };
-        if (mimeType != null)
-        {
-            projectfile.MimeType = mimeType;
-        }
         _dbContext.ProjectFiles.Add(projectfile);
         await _dbContext.SaveChangesAsync();
         responseWrite.ResourceId = projectfile.Id;

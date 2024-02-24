@@ -1,6 +1,5 @@
 namespace MissionDevBack.Db;
 
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -34,11 +33,11 @@ public static class MissionDevSeed
         context.Projects.ExecuteDelete();
         var projects = new Project[]
            {
-                new() {Title="Astre", Deadline= new DateTime(2023, 8, 1), Users = [user1], State = EProjectState.Done },
-                new() {Title="Site de l'IIAS", Deadline= new DateTime(2023, 5, 1), Users = users, State = EProjectState.Done },
-                new() {Title="Flammèche", Deadline= new DateTime(2024, 6, 1), Users = [user1], State = EProjectState.Started },
-                new() {Title="Pascomacte", Users = [user2], State = EProjectState.Pending },
-                new() {Title="Intranet", Deadline= new DateTime(2023, 2, 22), Users = users, State = EProjectState.Started },
+                new() {Title="Astre", Deadline= new DateTime(2023, 8, 1), State = EProjectState.Done },
+                new() {Title="Site de l'IIAS", Deadline= new DateTime(2023, 5, 1), State = EProjectState.Done },
+                new() {Title="Flammèche", Deadline= new DateTime(2024, 6, 1), State = EProjectState.Started },
+                new() {Title="Pascomacte", State = EProjectState.Pending },
+                new() {Title="Intranet", Deadline= new DateTime(2023, 2, 22), State = EProjectState.Started },
            };
         await context.Projects.AddRangeAsync(projects);
 

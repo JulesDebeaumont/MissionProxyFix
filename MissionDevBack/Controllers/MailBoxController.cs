@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MimeTypes;
 using MissionDevBack.Db;
 using MissionDevBack.Models;
 using MissionDevBack.Services;
@@ -10,10 +11,10 @@ namespace MissionDevBack.Controllers
     public class MailBoxController : ControllerBase
     {
         private readonly MissionDevContext _context;
-        private readonly ZimbraService _mailService;
+        private readonly MailBoxService _mailService;
         private readonly FileStorageService _storageService;
 
-        public MailBoxController(MissionDevContext context, ZimbraService mailService, FileStorageService storageService)
+        public MailBoxController(MissionDevContext context, MailBoxService mailService, FileStorageService storageService)
         {
             _context = context;
             _mailService = mailService;
@@ -30,7 +31,7 @@ namespace MissionDevBack.Controllers
                 return NotFound();
             }
 
-            var responseService = await _mailService.GetUserZimbraAuthToken(bodyParams.email, bodyParams.password);
+            var responseService = await _mailService.GetMailBoxAuthToken(bodyParams.email, bodyParams.password);
             if (!responseService.IsSuccess)
             {
                 return BadRequest(responseService.Errors);
@@ -88,7 +89,7 @@ namespace MissionDevBack.Controllers
                 return BadRequest(responseService.Errors);
             }
 
-            return File(responseService.Blob, "images/png"); // TODO content-type
+            return File(responseService.Blob, MimeTypeMap.GetMimeType(queryParams.Filename));
         }
 
         // POST: api/MailBox/TransfertAttachmentToProject
@@ -105,22 +106,22 @@ namespace MissionDevBack.Controllers
             {
                 return BadRequest(responseService.Errors);
             }
-            using (MemoryStream memoryStream = new MemoryStream(responseService.Blob))
+            
+            using (var memoryStream = new MemoryStream(responseService.Blob))
             {
-                var file = new FormFile(memoryStream, 0, responseService.Blob.Length, null, "TODO.png")
-                {
-                    ContentType = "TODO"
-                };
+                var file = new FormFile(memoryStream, 0, responseService.Blob.Length, null, queryParams.Filename);
                 var responseWriteFile = await _storageService.WriteProjectFileToStorageAsync(file, queryParams.ProjectId);
                 foreach (var errorFile in responseWriteFile.Errors)
                 {
                     ModelState.AddModelError("File", errorFile);
                 }
             }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState.Values.SelectMany(value => value.Errors).ToList());
             }
+
             return Ok();
         }
     }

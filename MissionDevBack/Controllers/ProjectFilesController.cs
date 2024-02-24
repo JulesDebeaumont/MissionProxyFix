@@ -22,22 +22,25 @@ namespace MissionDevBack.Controllers
         [HttpPost("Upload")]
         public async Task<IActionResult> UploadFiles(ProjectFilesUploadFilesParams uploadFilesParams)
         {
-            if (uploadFilesParams.files.Count == 0)
+            if (uploadFilesParams.Files.Count == 0)
             {
                 return BadRequest();
             }
-            foreach (var file in uploadFilesParams.files) {
+            foreach (var file in uploadFilesParams.Files)
+            {
                 var responseWriteFile = await _storageService.WriteProjectFileToStorageAsync(file, uploadFilesParams.ProjectId);
                 foreach (var errorFile in responseWriteFile.Errors)
                 {
                     ModelState.AddModelError("File", errorFile);
                 }
             }
-            if (!ModelState.IsValid) {
+            if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState.Values.SelectMany(value => value.Errors).ToList());
             }
             return Ok();
         }
+
 
         [HttpGet("Download/{projectFileId}")]
         public async Task<IActionResult> DownloadFile(string projectFileId)
@@ -52,23 +55,10 @@ namespace MissionDevBack.Controllers
             {
                 return NotFound();
             }
-            
+
             return File(file.FileBytes, projectFile.MimeType);
         }
 
-        [HttpPatch("ToggleIsShared/{projectFileId}")]
-        public async Task<IActionResult> ToggleIsShared(string projectFileId)
-        {
-            var projectFile = await _context.ProjectFiles.FindAsync(projectFileId);
-            if (projectFile == null)
-            {
-                return NotFound();
-            }
-            projectFile.IsShared = !projectFile.IsShared;
-            await _context.SaveChangesAsync();
-            
-            return Ok();
-        }
 
         [HttpDelete("Delete/{projectFileId}")]
         public async Task<IActionResult> DeleteFile(string projectFileId)
@@ -80,7 +70,22 @@ namespace MissionDevBack.Controllers
             }
             _context.ProjectFiles.Remove(projectFile);
             await _context.SaveChangesAsync();
-            
+
+            return Ok();
+        }
+
+
+        [HttpPatch("ToggleIsShared/{projectFileId}")]
+        public async Task<IActionResult> ToggleIsShared(string projectFileId)
+        {
+            var projectFile = await _context.ProjectFiles.FindAsync(projectFileId);
+            if (projectFile == null)
+            {
+                return NotFound();
+            }
+            projectFile.IsShared = !projectFile.IsShared;
+            await _context.SaveChangesAsync();
+
             return Ok();
         }
 

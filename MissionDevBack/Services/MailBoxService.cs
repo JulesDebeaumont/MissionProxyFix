@@ -6,14 +6,14 @@ using MissionDevBack.Models;
 
 namespace MissionDevBack.Services;
 
-public partial class ZimbraService
+public partial class MailBoxService
 {
     private readonly string ZimbraUrl = "https://mail.chu-reims.fr/";
     private readonly string ZimbraDomain = "mail.chu-reims.fr";
     private readonly string ZimbraAuthToken = "ZM_AUTH_TOKEN";
 
 
-    public async Task<ZimbraServiceResponseToken> GetUserZimbraAuthToken(string email, string password)
+    public async Task<ZimbraServiceResponseToken> GetMailBoxAuthToken(string email, string password)
     {
         var responseServiceZimbra = new ZimbraServiceResponseToken();
         try

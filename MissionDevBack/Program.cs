@@ -22,7 +22,7 @@ builder.Services.AddDbContext<MissionDevContext>(options =>
 builder.Services.AddTransient<AuthService>();
 builder.Services.AddTransient<NoyauSihService>();
 builder.Services.AddTransient<FileStorageService>();
-builder.Services.AddTransient<ZimbraService>();
+builder.Services.AddTransient<MailBoxService>();
 
 builder.Services.AddIdentityCore<User>()
             .AddEntityFrameworkStores<MissionDevContext>()

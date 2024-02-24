@@ -2,9 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MissionDevBack.Models;
 
-public class ProjectFilesUploadFilesParams
+public class UserFilesUploadFilesParams
 {
     [Required]
-    public int ProjectId { get; set;}
+    public string UserId { get; set;}
     public List<IFormFile> Files { get; set; }
 }
