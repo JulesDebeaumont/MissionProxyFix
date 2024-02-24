@@ -9,6 +9,7 @@ import SketchComponentRawContentEditor from 'src/components/project/sketch/canva
 // props
 const propsComponent = defineProps<{
   componentData: ISidebarComponentData;
+  isRoot: boolean;
 }>();
 
 // refs
@@ -40,7 +41,10 @@ function copyToClipBoard(propsAsString: string, content: string) {
         v-for="(childCompo, indexChild) in elementDataRef.children"
         :key="indexChild"
       >
-        <SketchCanvasGenericRecursiveComponent :componentData="childCompo" />
+        <SketchCanvasGenericRecursiveComponent
+          :componentData="childCompo"
+          :is-root="false"
+        />
       </template>
       <SketchComponentMenu
         :elementData="elementDataRef"

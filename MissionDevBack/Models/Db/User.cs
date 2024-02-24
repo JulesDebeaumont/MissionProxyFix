@@ -17,5 +17,5 @@ public class User : IdentityUser
     public string RefreshToken { get; set; }
     public DateTime RefreshTokenExpiry { get; set; }
     public List<EUserRoles> Roles { get; set; } = [];
-    public ICollection<Project> Projects { get; set; }
+    public ICollection<ProjectUser> ProjectUsers { get; set; }
 }

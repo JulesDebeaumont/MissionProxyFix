@@ -18,4 +18,5 @@ public sealed class MissionDevContext : IdentityDbContext<User>
     public DbSet<Project> Projects { get; set; }
     public DbSet<ProjectFile> ProjectFiles { get; set; }
     public DbSet<UserFile> UserFiles { get; set; }
+    public DbSet<ProjectUser> ProjectUsers { get; set; }
 }

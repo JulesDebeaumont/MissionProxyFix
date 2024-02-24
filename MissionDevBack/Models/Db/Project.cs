@@ -24,5 +24,5 @@ public class Project
     [Required]
     public EProjectState State { get; set; } = EProjectState.Pending;
 
-    public ICollection<User> Users { get; set; }
+    public ICollection<ProjectUser> ProjectUsers { get; set; }
 }

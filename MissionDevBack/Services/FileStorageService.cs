@@ -175,7 +175,7 @@ public class FileStorageService
         return getFileResponse;
     }
 
-    public async Task<FileStorageGetFileResponse> GetProjectFileFromStorageAsync(UserFile projectFile)
+    public async Task<FileStorageGetFileResponse> GetProjectFileFromStorageAsync(ProjectFile projectFile)
     {
         var relativePathInStorage = Path.Combine(ProjectFileOptions.Folder, projectFile.StorageFilename);
         var getFileResponse = await GetFileFromStorageAsync(relativePathInStorage);

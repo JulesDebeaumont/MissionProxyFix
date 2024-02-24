@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MissionDevBack.Models;
 
-public class ProjectFile 
+public class ProjectFile
 {
     public int Id { get; set; }
 
@@ -17,6 +17,15 @@ public class ProjectFile
 
     [Required]
     public DateTime CreatedAt { get; set; }
+
+    public int UserId { get; set; }
+
+    public User User { get; set; }
+
+    public string IdFromMail { get; set; }
+
+    [Required]
+    public bool IsShared { get; set; } = false;
 
     [Required]
     public int ProjectId { get; set; }
