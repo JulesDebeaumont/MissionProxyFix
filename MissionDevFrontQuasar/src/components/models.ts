@@ -1,3 +1,5 @@
+import { ISidebarComponentData } from 'src/utils/sketch-sidebar';
+
 export type TRole = 'ADMIN' | 'WORKER';
 
 export interface ITokenDecode {
@@ -20,6 +22,33 @@ export interface IProject {
   description: string;
   state: number;
   deadline: string;
+}
+
+export interface ISketch {
+  id: number;
+  title: string;
+  core: ISketchCore;
+  isShared: boolean;
+  authorId: number;
+  author?: IUser;
+  projectId: number;
+  project?: IProject;
+}
+
+export interface ISketchCore {
+  id: string;
+  type: 'custom';
+  data?: ISidebarComponentData;
+  dragging: boolean;
+  position: {
+    x: number;
+    y: number;
+  };
+}
+
+export interface IPosition {
+  x: number;
+  y: number;
 }
 
 export interface IZimbraMailPreview {

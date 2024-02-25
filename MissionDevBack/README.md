@@ -3,7 +3,8 @@ Controllers scaffold : `dotnet aspnet-codegenerator controller -name UsersContro
 EF scaffold (scaffold from Db) : `dotnet ef dbcontext scaffold`  
 dotnet ef database drop  
 dotnet ef database update  
-dotnet ef database create  
+dotnet ef database create 
+dotnet ef database reset
 dotnet ef migrations add InitialCreate  
 dotnet ef migrations add  
 

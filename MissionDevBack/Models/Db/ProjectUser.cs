@@ -4,7 +4,9 @@ namespace MissionDevBack.Models;
 
 public class ProjectUser
 {
-    public int UserId { get; set; }
+    public int Id { get; set;}
+    
+    public string UserId { get; set; }
 
     public User User { get; set; }
 

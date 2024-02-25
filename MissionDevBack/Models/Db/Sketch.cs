@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MissionDevBack.Models;
 
@@ -13,7 +14,11 @@ public class Sketch
     public string Title { get; set; }
 
     [Required]
-    public int AuthorId { get; set; }
+    [Column(TypeName = "jsonb")]
+    public string Core { get; set;}
+
+    [Required]
+    public string AuthorId { get; set; }
 
     public User Author { get; set; }
 

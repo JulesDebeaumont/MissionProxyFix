@@ -18,11 +18,11 @@ public class ProjectFile
     [Required]
     public DateTime CreatedAt { get; set; }
 
-    public int UserId { get; set; }
+    public string UserId { get; set; }
 
     public User User { get; set; }
 
-    public string IdFromMail { get; set; }
+    public string FromMailId { get; set; }
 
     [Required]
     public bool IsShared { get; set; } = false;
