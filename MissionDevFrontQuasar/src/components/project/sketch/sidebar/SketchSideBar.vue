@@ -11,7 +11,7 @@ import SketchSideBarMenu from 'src/components/project/sketch/sidebar/SketchSideB
 // interfaces
 interface ISketchSidebarMenu {
   label: string;
-  listOfComponent: ISidebarComponentData[];
+  listOfComponent: (() => ISidebarComponentData)[];
 }
 
 // consts

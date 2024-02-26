@@ -6,7 +6,7 @@ import SketchSidebarGenericRecursiveComponent from 'src/components/project/sketc
 
 // props
 const propsComponent = defineProps<{
-  listOfComponent: ISidebarComponentData[];
+  listOfComponent: (() => ISidebarComponentData)[];
 }>();
 
 // consts
@@ -20,9 +20,9 @@ const { onDragStart } = useDragAndDrop();
     class="q-gutter-sm"
   >
     <SketchSidebarGenericRecursiveComponent
-      :componentData="chipCompo"
+      :componentData="chipCompo()"
       :draggable="true"
-      @dragstart="onDragStart($event, chipCompo)"
+      @dragstart="onDragStart($event, chipCompo())"
     />
   </div>
 </template>

@@ -23,7 +23,7 @@ export default function useDragAndDrop() {
     document.body.style.userSelect = dragging ? 'none' : '';
   });
 
-  function onDragStart(event: DragEvent, componentData: any) {
+  function onDragStart(event: DragEvent, componentData: ISidebarComponentData) {
     if (event.dataTransfer) {
       event.dataTransfer.effectAllowed = 'move';
     }

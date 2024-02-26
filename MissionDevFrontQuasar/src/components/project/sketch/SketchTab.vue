@@ -53,20 +53,29 @@ onNodesChange((changes) => {
     let stickyElementFound = false;
 
     if (stickyMode.value) {
-      const currentHoveredElement = getNodeElementFromCursor(
-        selectNodeId.value
+      const currentDraggableElement = document.querySelector(
+        `[data-id='${selectNodeId.value}']`
       );
-      if (currentHoveredElement !== null) {
-        const rectElementPosition = getElementRectPositions(
-          currentHoveredElement
+      if (currentDraggableElement) {
+        const deltaCurrentDrag = getDeltaClosestPositionFromMouse(
+          getElementRectPositions(currentDraggableElement)
         );
-        const stickyPosition =
-          getClosestRectPositionFromMouse(rectElementPosition);
-        const stickyPositionForViewport =
-          getElementPositionTranslatedForViewport(stickyPosition);
-        nextXPosition = stickyPositionForViewport.x;
-        nextYPosition = stickyPositionForViewport.y;
-        stickyElementFound = true;
+
+        const currentHoveredElement = getNodeElementFromCursor(
+          selectNodeId.value
+        );
+        if (currentHoveredElement !== null) {
+          const rectElementPosition = getElementRectPositions(
+            currentHoveredElement
+          );
+          const stickyPosition =
+            getClosestRectPositionFromMouse(rectElementPosition);
+          const stickyPositionForViewport =
+            getElementPositionTranslatedForViewport(stickyPosition);
+          nextXPosition = stickyPositionForViewport.x - deltaCurrentDrag.x;
+          nextYPosition = stickyPositionForViewport.y - deltaCurrentDrag.y;
+          stickyElementFound = true;
+        }
       }
     }
 
@@ -130,10 +139,8 @@ const cursorX = ref(0);
 const cursorY = ref(0);
 const stickyMode = ref(false);
 const selectNodeId = ref<string | null>(null);
-const slowMode = ref(false); // TODO
 
 // functions
-
 function pressKeyEvent(event: KeyboardEvent) {
   if (event.key === 'x') {
     xMode.value = true;
@@ -206,6 +213,43 @@ function getClosestRectPositionFromMouse(rectPosition: DOMRect) {
       );
     })
     .at(0) as IPosition;
+}
+function getDeltaClosestPositionFromMouse(rectPosition: DOMRect) {
+  const topLeft: IPosition = { x: 0, y: 0 };
+  const topRight: IPosition = {
+    x: rectPosition.right - rectPosition.left,
+    y: 0,
+  };
+  const bottomLeft: IPosition = {
+    x: 0,
+    y: rectPosition.bottom - rectPosition.top,
+  };
+  const bottomRight: IPosition = {
+    x: rectPosition.right - rectPosition.left,
+    y: rectPosition.bottom - rectPosition.top,
+  };
+  return [
+    { place: topLeft, position: { x: rectPosition.left, y: rectPosition.top } },
+    {
+      place: topRight,
+      position: { x: rectPosition.right, y: rectPosition.top },
+    },
+    {
+      place: bottomLeft,
+      position: { x: rectPosition.left, y: rectPosition.bottom },
+    },
+    {
+      place: bottomRight,
+      position: { x: rectPosition.right, y: rectPosition.bottom },
+    },
+  ]
+    .sort((positionSortA, positionSortB) => {
+      return (
+        getDistanceBetweenPositionAndCursor(positionSortA.position) -
+        getDistanceBetweenPositionAndCursor(positionSortB.position)
+      );
+    })
+    .at(0)?.place as IPosition;
 }
 function getDistanceBetweenPositionAndCursor(position: IPosition) {
   // Pythagore

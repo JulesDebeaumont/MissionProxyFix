@@ -7,49 +7,55 @@ export interface ISidebarComponentData {
   rawContent?: string;
 }
 
-export const buttonComponents: ISidebarComponentData[] = [
-  {
-    type: QBtn,
-    props: {
-      color: 'red',
-      label: 'Mommy',
-    },
-    children: [],
-  },
-];
-
-export const chipComponents: ISidebarComponentData[] = [
-  {
-    type: QChip,
-    props: {
-      color: 'red',
-      label: 'Mommy',
-    },
-    children: [],
-  },
-];
-
-export const cardComponents: ISidebarComponentData[] = [
-  {
-    type: QCard,
-    props: {
-      bordered: true,
-    },
-    children: [
-      {
-        type: QCardSection,
-        props: {},
-        children: [
-          {
-            type: 'div',
-            props: {
-              class: 'text-h6',
-            },
-            rawContent: 'Our Changing Planet',
-            children: [],
-          },
-        ],
+export const buttonComponents: (() => ISidebarComponentData)[] = [
+  () => {
+    return {
+      type: QBtn,
+      props: {
+        color: 'red',
+        label: 'Mommy',
       },
-    ],
+      children: [],
+    };
+  },
+];
+
+export const chipComponents: (() => ISidebarComponentData)[] = [
+  () => {
+    return {
+      type: QChip,
+      props: {
+        color: 'red',
+        label: 'Mommy',
+      },
+      children: [],
+    };
+  },
+];
+
+export const cardComponents: (() => ISidebarComponentData)[] = [
+  () => {
+    return {
+      type: QCard,
+      props: {
+        bordered: true,
+      },
+      children: [
+        {
+          type: QCardSection,
+          props: {},
+          children: [
+            {
+              type: 'div',
+              props: {
+                class: 'text-h6',
+              },
+              rawContent: 'Our Changing Planet',
+              children: [],
+            },
+          ],
+        },
+      ],
+    };
   },
 ];
