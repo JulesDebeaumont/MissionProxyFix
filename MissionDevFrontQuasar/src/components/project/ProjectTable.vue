@@ -43,13 +43,13 @@ const projectTableColumns: QTableProps['columns'] = [
   },
   {
     name: 'users',
-    align: 'left',
-    label: 'Devs',
+    align: 'center',
+    label: 'Utilisateurs',
     field: 'users',
   },
   {
     name: 'actions',
-    align: 'left',
+    align: 'right',
     label: 'Actions',
     field: 'actions',
   },
@@ -144,7 +144,7 @@ onMounted(async () => {
           @click="router.push({ name: 'project-new' })"
           color="primary"
           label="Créer un projet"
-          class="q-mb-lg"
+          class="q-mb-lg rounded-borders"
           no-caps
         />
       </template>
@@ -152,13 +152,12 @@ onMounted(async () => {
       <template #top-left>
         <q-input
           v-model="filterByNameRef"
-          borderless
-          dense
           placeholder="Filtrer par nom..."
           debounce="400"
           class="bg-white"
-          clearable
+          color="primary"
           rounded
+          dense
           @update:model-value="filterProjectByName"
         >
           <template #prepend>
@@ -190,53 +189,51 @@ onMounted(async () => {
           </q-td>
           <q-td key="users">
             <q-chip
-              v-for="user in props.row.users"
-              :key="user.id"
+              v-for="projectUser in props.row.projectUsers"
+              :key="projectUser.id"
               color="info"
               text-color="white"
               size="sm"
             >
-              {{ user.fullname }}
+              {{ projectUser.user.fullname }}
             </q-chip>
           </q-td>
-          <q-td key="actions" :props="props">
-            <q-icon
-              @click="
-                router.push({
-                  name: `project-show`,
-                  params: { projectId: props.row.id },
-                })
-              "
-              name="visibility"
-              color="primary"
+          <q-td key="actions" :props="props" class="q-gutter-x-sm">
+            <q-btn
+              round
+              icon="visibility"
+              color="info"
               size="sm"
-              class="cursor-pointer"
+              :to="{
+                name: `project-show`,
+                params: { projectId: props.row.id },
+              }"
             >
               <q-tooltip>Voir</q-tooltip>
-            </q-icon>
-            <q-icon
-              @click="
-                router.push({
-                  name: 'project-edit',
-                  params: { projectId: props.row.id },
-                })
-              "
-              name="edit"
+            </q-btn>
+
+            <q-btn
+              round
+              icon="edit"
               color="warning"
               size="sm"
-              class="cursor-pointer"
+              :to="{
+                name: 'project-edit',
+                params: { projectId: props.row.id },
+              }"
             >
               <q-tooltip>Editer</q-tooltip>
-            </q-icon>
-            <q-icon
-              @click="setupDialogDeleteProject(props.row)"
-              name="delete"
-              size="sm"
+            </q-btn>
+
+            <q-btn
+              round
+              icon="delete"
               color="negative"
-              class="cursor-pointer"
+              size="sm"
+              @click="setupDialogDeleteProject(props.row)"
             >
               <q-tooltip>Supprimer</q-tooltip>
-            </q-icon>
+            </q-btn>
           </q-td>
         </q-tr>
       </template>

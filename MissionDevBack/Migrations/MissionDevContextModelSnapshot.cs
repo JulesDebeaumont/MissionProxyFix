@@ -162,7 +162,7 @@ namespace MissionDevBack.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Deadline")
+                    b.Property<DateTime?>("Deadline")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
@@ -195,7 +195,7 @@ namespace MissionDevBack.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("IdFromMail")
+                    b.Property<string>("FromMailId")
                         .HasColumnType("text");
 
                     b.Property<bool>("IsShared")
@@ -212,17 +212,15 @@ namespace MissionDevBack.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("UserId1")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProjectId");
 
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId");
 
                     b.ToTable("ProjectFiles");
                 });
@@ -241,17 +239,15 @@ namespace MissionDevBack.Migrations
                     b.Property<int>("ProjectId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("UserId1")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProjectId");
 
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId");
 
                     b.ToTable("ProjectUsers");
                 });
@@ -264,10 +260,8 @@ namespace MissionDevBack.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("AuthorId1")
+                    b.Property<string>("AuthorId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Core")
@@ -286,7 +280,7 @@ namespace MissionDevBack.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AuthorId1");
+                    b.HasIndex("AuthorId");
 
                     b.HasIndex("ProjectId");
 
@@ -461,14 +455,16 @@ namespace MissionDevBack.Migrations
             modelBuilder.Entity("MissionDevBack.Models.ProjectFile", b =>
                 {
                     b.HasOne("MissionDevBack.Models.Project", "Project")
-                        .WithMany()
+                        .WithMany("ProjectFiles")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MissionDevBack.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId1");
+                        .WithMany("ProjectFiles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Project");
 
@@ -485,7 +481,9 @@ namespace MissionDevBack.Migrations
 
                     b.HasOne("MissionDevBack.Models.User", "User")
                         .WithMany("ProjectUsers")
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Project");
 
@@ -495,11 +493,13 @@ namespace MissionDevBack.Migrations
             modelBuilder.Entity("MissionDevBack.Models.Sketch", b =>
                 {
                     b.HasOne("MissionDevBack.Models.User", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorId1");
+                        .WithMany("Sketches")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("MissionDevBack.Models.Project", "Project")
-                        .WithMany()
+                        .WithMany("Sketches")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -512,7 +512,7 @@ namespace MissionDevBack.Migrations
             modelBuilder.Entity("MissionDevBack.Models.UserFile", b =>
                 {
                     b.HasOne("MissionDevBack.Models.User", "User")
-                        .WithMany()
+                        .WithMany("UserFiles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -522,12 +522,22 @@ namespace MissionDevBack.Migrations
 
             modelBuilder.Entity("MissionDevBack.Models.Project", b =>
                 {
+                    b.Navigation("ProjectFiles");
+
                     b.Navigation("ProjectUsers");
+
+                    b.Navigation("Sketches");
                 });
 
             modelBuilder.Entity("MissionDevBack.Models.User", b =>
                 {
+                    b.Navigation("ProjectFiles");
+
                     b.Navigation("ProjectUsers");
+
+                    b.Navigation("Sketches");
+
+                    b.Navigation("UserFiles");
                 });
 #pragma warning restore 612, 618
         }

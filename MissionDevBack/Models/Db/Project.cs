@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MissionDevBack.Models;
 
@@ -19,10 +20,14 @@ public class Project
 
     public string Description { get; set; }
 
-    public DateTime Deadline { get; set; }
+    public DateTime? Deadline { get; set; }
 
     [Required]
     public EProjectState State { get; set; } = EProjectState.Pending;
 
     public ICollection<ProjectUser> ProjectUsers { get; set; }
+
+    public ICollection<Sketch> Sketches { get; set; }
+
+    public ICollection<ProjectFile> ProjectFiles { get; set; }
 }

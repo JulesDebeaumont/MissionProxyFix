@@ -25,7 +25,28 @@ namespace MissionDevBack.Controllers
                 projectIndexParams.limit = 20;
             }
             var rowCount = _context.Projects.Count();
-            var projects = await _context.Projects.Skip(projectIndexParams.offset).Take(projectIndexParams.limit).ToListAsync();
+            var projects = await _context.Projects
+                .Skip(projectIndexParams.offset)
+                .Take(projectIndexParams.limit)
+                .Select(p => new Project
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                    State = p.State,
+                    Deadline = p.Deadline,
+                    ProjectUsers = (ICollection<ProjectUser>)p.ProjectUsers.Select(pu => new ProjectUser
+                    {
+                        Id = pu.Id,
+                        ProjectId = pu.ProjectId,
+                        UserId = pu.UserId,
+                        User = new User
+                        {
+                            Id = pu.UserId,
+                            Fullname = pu.User.Fullname
+                        }
+                    })
+                })
+                .ToListAsync();
             return Ok(new { rowCount, projects });
         }
 

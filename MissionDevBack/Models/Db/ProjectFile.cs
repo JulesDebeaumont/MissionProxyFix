@@ -18,6 +18,7 @@ public class ProjectFile
     [Required]
     public DateTime CreatedAt { get; set; }
 
+    [Required]
     public string UserId { get; set; }
 
     public User User { get; set; }

@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MissionDevBack.Migrations
 {
     /// <inheritdoc />
-    public partial class InitalCreate : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -64,7 +64,7 @@ namespace MissionDevBack.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Title = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    Deadline = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Deadline = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     State = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -211,9 +211,8 @@ namespace MissionDevBack.Migrations
                     StorageFilename = table.Column<string>(type: "text", nullable: false),
                     MimeType = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
-                    UserId1 = table.Column<string>(type: "text", nullable: true),
-                    IdFromMail = table.Column<string>(type: "text", nullable: true),
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    FromMailId = table.Column<string>(type: "text", nullable: true),
                     IsShared = table.Column<bool>(type: "boolean", nullable: false),
                     ProjectId = table.Column<int>(type: "integer", nullable: false)
                 },
@@ -221,10 +220,11 @@ namespace MissionDevBack.Migrations
                 {
                     table.PrimaryKey("PK_ProjectFiles", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProjectFiles_AspNetUsers_UserId1",
-                        column: x => x.UserId1,
+                        name: "FK_ProjectFiles_AspNetUsers_UserId",
+                        column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ProjectFiles_Projects_ProjectId",
                         column: x => x.ProjectId,
@@ -239,8 +239,7 @@ namespace MissionDevBack.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
-                    UserId1 = table.Column<string>(type: "text", nullable: true),
+                    UserId = table.Column<string>(type: "text", nullable: false),
                     ProjectId = table.Column<int>(type: "integer", nullable: false),
                     MailFolderName = table.Column<string>(type: "text", nullable: true)
                 },
@@ -248,10 +247,11 @@ namespace MissionDevBack.Migrations
                 {
                     table.PrimaryKey("PK_ProjectUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProjectUsers_AspNetUsers_UserId1",
-                        column: x => x.UserId1,
+                        name: "FK_ProjectUsers_AspNetUsers_UserId",
+                        column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ProjectUsers_Projects_ProjectId",
                         column: x => x.ProjectId,
@@ -269,18 +269,18 @@ namespace MissionDevBack.Migrations
                     IsShared = table.Column<bool>(type: "boolean", nullable: false),
                     Title = table.Column<string>(type: "text", nullable: false),
                     Core = table.Column<string>(type: "jsonb", nullable: false),
-                    AuthorId = table.Column<int>(type: "integer", nullable: false),
-                    AuthorId1 = table.Column<string>(type: "text", nullable: true),
+                    AuthorId = table.Column<string>(type: "text", nullable: false),
                     ProjectId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Sketches", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Sketches_AspNetUsers_AuthorId1",
-                        column: x => x.AuthorId1,
+                        name: "FK_Sketches_AspNetUsers_AuthorId",
+                        column: x => x.AuthorId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Sketches_Projects_ProjectId",
                         column: x => x.ProjectId,
@@ -332,9 +332,9 @@ namespace MissionDevBack.Migrations
                 column: "ProjectId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProjectFiles_UserId1",
+                name: "IX_ProjectFiles_UserId",
                 table: "ProjectFiles",
-                column: "UserId1");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProjectUsers_ProjectId",
@@ -342,14 +342,14 @@ namespace MissionDevBack.Migrations
                 column: "ProjectId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProjectUsers_UserId1",
+                name: "IX_ProjectUsers_UserId",
                 table: "ProjectUsers",
-                column: "UserId1");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Sketches_AuthorId1",
+                name: "IX_Sketches_AuthorId",
                 table: "Sketches",
-                column: "AuthorId1");
+                column: "AuthorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Sketches_ProjectId",

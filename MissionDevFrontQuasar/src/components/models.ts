@@ -14,6 +14,7 @@ export interface IUser {
   idres: string;
   fullname: string;
   roles: TRole[];
+  projectUsers?: IProjectUser[];
 }
 
 export interface IProject {
@@ -22,6 +23,16 @@ export interface IProject {
   description: string;
   state: number;
   deadline: string;
+  projectUsers?: IProjectUser[];
+}
+
+export interface IProjectUser {
+  id: number;
+  projectId: number;
+  project?: IProject;
+  userId: string;
+  user?: IUser;
+  MailFolderName: string;
 }
 
 export interface ISketch {
