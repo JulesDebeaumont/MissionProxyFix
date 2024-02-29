@@ -48,6 +48,16 @@ export default boot(({ router }) => {
     },
     function (error) {
       console.error(error);
+      if (error.response?.status === 400) {
+        Notify.create({
+          type: 'warning',
+          message: error?.response.data
+            .map((errorData: any) => {
+              return errorData.errorMessage;
+            })
+            .join(', '),
+        });
+      }
       if (error.response?.status === 401) {
         userStore.clear();
         router.push({ name: ROUTE_NAME_LOGIN });

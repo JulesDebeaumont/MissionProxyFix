@@ -9,7 +9,7 @@ public static class MissionDevSeed
 {
     public static async Task RunAsync(MissionDevContext context, UserManager<User> userManager)
     {
-        if (false)
+        if (true)
         {
             return;
         }

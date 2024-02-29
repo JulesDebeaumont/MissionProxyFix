@@ -35,6 +35,30 @@ export interface IProjectUser {
   MailFolderName: string;
 }
 
+export interface IUserFile {
+  id: number;
+  filename: string;
+  mimeType: string;
+  createdAt: string;
+  updatedAt: string;
+  userId: number;
+  user?: IUser;
+}
+
+export interface IProjectFiler {
+  id: number;
+  filename: string;
+  mimeType: string;
+  createAt: string;
+  updatedAt: string;
+  userId: number;
+  user?: IUser;
+  fromMailId: string | null;
+  isShared: boolean;
+  projectId: number;
+  project?: IProject;
+}
+
 export interface ISketch {
   id: number;
   title: string;

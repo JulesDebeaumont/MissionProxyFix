@@ -14,7 +14,7 @@ const route = useRoute();
 const menus: ISidebarMenu[] = [
   {
     label: 'Projets',
-    routeName: 'project-list',
+    routeName: 'myProjects',
     routeCheckString: 'project',
     icon: 'rocket_launch',
   },
@@ -28,7 +28,7 @@ const menus: ISidebarMenu[] = [
 
 // functions
 function isPartOfRoute(menu: ISidebarMenu) {
-  return route.name?.toString().includes(menu.routeCheckString);
+  return route.name?.toString().toLowerCase().includes(menu.routeCheckString);
 }
 </script>
 
@@ -39,7 +39,7 @@ function isPartOfRoute(menu: ISidebarMenu) {
       clickable
       v-for="menu in menus"
       :key="menu.label"
-      :to="menu.routeName"
+      :to="{ name: menu.routeName }"
     >
       <q-item-section avatar>
         <q-item-section avatar>

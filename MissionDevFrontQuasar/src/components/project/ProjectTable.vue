@@ -141,7 +141,7 @@ onMounted(async () => {
     >
       <template #top-right>
         <q-btn
-          @click="router.push({ name: 'project-new' })"
+          @click="router.push({ name: 'projectCreate' })"
           color="primary"
           label="Créer un projet"
           class="q-mb-lg rounded-borders"
@@ -205,7 +205,7 @@ onMounted(async () => {
               color="info"
               size="sm"
               :to="{
-                name: `project-show`,
+                name: `projectShow`,
                 params: { projectId: props.row.id },
               }"
             >
@@ -218,7 +218,7 @@ onMounted(async () => {
               color="warning"
               size="sm"
               :to="{
-                name: 'project-edit',
+                name: 'projectEdit',
                 params: { projectId: props.row.id },
               }"
             >

@@ -196,7 +196,7 @@ public class FileStorageService
     private static class UserFileOptions
     {
         public readonly static string Folder = "UserFile";
-        public readonly static string[] PermittedExtensions = [".pdf", ".csv", ".docx", ".json"];
+        public readonly static string[] PermittedExtensions = [".pdf", ".csv", ".docx", ".json", ".png", ".jpeg"];
         public readonly static long MaxFileLength = 5L * 1024L * 1024L; // 5Mb
     }
 

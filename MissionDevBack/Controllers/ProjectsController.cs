@@ -28,18 +28,18 @@ namespace MissionDevBack.Controllers
             var projects = await _context.Projects
                 .Skip(projectIndexParams.offset)
                 .Take(projectIndexParams.limit)
-                .Select(p => new Project
+                .Select(p => new 
                 {
                     Id = p.Id,
                     Title = p.Title,
                     State = p.State,
                     Deadline = p.Deadline,
-                    ProjectUsers = (ICollection<ProjectUser>)p.ProjectUsers.Select(pu => new ProjectUser
+                    ProjectUsers = p.ProjectUsers.Select(pu => new 
                     {
                         Id = pu.Id,
                         ProjectId = pu.ProjectId,
                         UserId = pu.UserId,
-                        User = new User
+                        User = new 
                         {
                             Id = pu.UserId,
                             Fullname = pu.User.Fullname

@@ -19,30 +19,35 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/dashboard',
     name: 'dashboard',
-    redirect: { name: 'my-projects' },
+    redirect: { name: 'myProjects' },
     beforeEnter: gateIsUserAuthenticated,
     children: [
+      {
+        path: 'documents',
+        name: 'documents',
+        component: () => import('pages/document/MyDocumentPage.vue'),
+      },
       {
         path: 'projects',
         children: [
           {
             path: 'my-projects',
-            name: 'my-projects',
+            name: 'myProjects',
             component: () => import('pages/project/UserProjectPage.vue'),
           },
           {
             path: ':projectId',
-            name: 'project-show',
+            name: 'projectShow',
             component: () => import('pages/project/ProjectPage.vue'),
           },
           {
             path: 'edit/:projectId',
-            name: 'project-edit',
+            name: 'projectEdit',
             component: () => import('pages/project/ProjectEditPage.vue'),
           },
           {
             path: 'create',
-            name: 'project-create',
+            name: 'projectCreate',
             component: () => import('pages/project/ProjectEditPage.vue'),
           },
         ],

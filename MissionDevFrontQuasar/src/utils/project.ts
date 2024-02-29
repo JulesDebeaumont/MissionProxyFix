@@ -1,13 +1,23 @@
 import { IProject } from 'src/components/models';
 
-export function displayProjectState(project: IProject) {
-  const stateDisplay: { [stateEnumIndex: number]: string } = {
+function getAllStates(): { [stateEnumIndex: number]: string } {
+  return {
     0: 'En cours',
     1: 'En attente',
     2: 'Terminé',
     3: 'Annulé',
   };
-  return stateDisplay[project.state];
+}
+export function getAllStatesOptions() {
+  return Object.entries(getAllStates()).map((entry) => {
+    return {
+      label: entry[1],
+      value: Number(entry[0]),
+    };
+  });
+}
+export function displayProjectState(project: IProject) {
+  return getAllStates()[project.state];
 }
 export function getColorClassByProjectState(project: IProject) {
   const stateDisplay: { [stateEnumIndex: number]: string } = {

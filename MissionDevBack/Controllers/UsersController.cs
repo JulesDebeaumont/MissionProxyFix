@@ -12,19 +12,37 @@ namespace MissionDevBack.Controllers
     public class UsersController : ControllerBase
     {
         private readonly MissionDevContext _context;
-        private readonly FileStorageService _storageService;
 
-        public UsersController(MissionDevContext context, FileStorageService storageService)
+        public UsersController(MissionDevContext context)
         {
             _context = context;
-            _storageService = storageService;
         }
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<User>>> GetUsers([FromQuery]string fullnameSearch)
         {
-            return await _context.Users.ToListAsync();
+            if (fullnameSearch is null)
+            {
+                return await _context.Users
+                .Select(u => new User
+                {
+                    Id = u.Id,
+                    Fullname = u.Fullname
+                })
+                .ToListAsync();
+            }
+            else
+            {
+                return await _context.Users
+                .Select(u => new User
+                {
+                    Id = u.Id,
+                    Fullname = u.Fullname
+                })
+                .Where(u => u.Fullname.ToLower().Contains(fullnameSearch.ToLower()))
+                .ToListAsync();
+            }
         }
 
         // GET: api/Users/5
@@ -97,13 +115,6 @@ namespace MissionDevBack.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        [HttpGet("adjime")]
-        [Authorize]
-        public async Task<IActionResult> TestUser()
-        {
-            return Ok(User.Identity.IsAuthenticated);
         }
 
         private bool UserExists(string id)
