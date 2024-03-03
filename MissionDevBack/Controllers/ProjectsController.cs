@@ -18,34 +18,28 @@ namespace MissionDevBack.Controllers
 
         // GET: api/Projects
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Project>>> GetProjects([FromQuery] ProjectIndexEndpointParams projectIndexParams)
+        public async Task<ActionResult<IEnumerable<GetProjectsDTOOut>>> GetProjects([FromQuery] ProjectIndexEndpointParams projectIndexParams)
         {
             if (projectIndexParams.limit > 20)
             {
                 projectIndexParams.limit = 20;
             }
-            var rowCount = _context.Projects.Count();
+            var rowCount = await _context.Projects.CountAsync();
             var projects = await _context.Projects
-                .Skip(projectIndexParams.offset)
-                .Take(projectIndexParams.limit)
-                .Select(p => new 
+                .Select(p => new GetProjectsDTOOut
                 {
                     Id = p.Id,
                     Title = p.Title,
-                    State = p.State,
                     Deadline = p.Deadline,
-                    ProjectUsers = p.ProjectUsers.Select(pu => new 
+                    State = p.State,
+                    Users = (ICollection<GetProjectsDTOOut.UserDTO>)p.ProjectUsers.Select(pu => new GetProjectsDTOOut.UserDTO
                     {
-                        Id = pu.Id,
-                        ProjectId = pu.ProjectId,
-                        UserId = pu.UserId,
-                        User = new 
-                        {
-                            Id = pu.UserId,
-                            Fullname = pu.User.Fullname
-                        }
+                        Id = pu.User.Id,
+                        Fullname = pu.User.Fullname
                     })
                 })
+                .Skip(projectIndexParams.offset)
+                .Take(projectIndexParams.limit)
                 .ToListAsync();
             return Ok(new { rowCount, projects });
         }
@@ -66,14 +60,38 @@ namespace MissionDevBack.Controllers
 
         // PUT: api/Projects/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProject(int id, Project project)
+        public async Task<IActionResult> PutProject(int id, PutProjectDTOIn projectParams)
         {
-            if (id != project.Id)
+            if (id != projectParams.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(project).State = EntityState.Modified;
+            var updateProject = new Project
+            {
+                Id = projectParams.Id,
+                Title = projectParams.Title,
+                Description = projectParams.Description,
+                State = projectParams.State,
+                Deadline = projectParams.Deadline
+            };
+
+            _context.Entry(updateProject).State = EntityState.Modified;
+
+            var existProjectUserIds = await _context.ProjectUsers
+            .Where(pu => pu.ProjectId == updateProject.Id)
+            .Select(pu => pu.UserId)
+            .ToListAsync();
+
+            var newProjectUsers = new List<ProjectUser>(projectParams.ProjectUsers
+            .Where(pu => !existProjectUserIds.Contains(pu.UserId))
+            .Select(pu => new ProjectUser
+            {
+                UserId = pu.UserId,
+                ProjectId = updateProject.Id
+            }
+            ));
+            _context.ProjectUsers.AddRange(newProjectUsers);
 
             try
             {
@@ -96,12 +114,42 @@ namespace MissionDevBack.Controllers
 
         // POST: api/Projects
         [HttpPost]
-        public async Task<ActionResult<Project>> PostProject(Project project)
+        public async Task<ActionResult<PostProjectDTOOut>> PostProject(PostProjectDTOIn projectParams)
         {
-            _context.Projects.Add(project);
+            var newProject = new Project
+            {
+                Title = projectParams.Title,
+                Description = projectParams.Description,
+                State = projectParams.State,
+                Deadline = projectParams.Deadline,
+            };
+            _context.Projects.Add(newProject);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProject", new { id = project.Id }, project);
+            var newProjectUsers = new List<ProjectUser>(projectParams.ProjectUsers.Select(pu => new ProjectUser
+            {
+                UserId = pu.UserId,
+                ProjectId = newProject.Id
+            }
+            ));
+            _context.ProjectUsers.AddRange(newProjectUsers);
+            await _context.SaveChangesAsync();
+
+            var projectDTO = new PostProjectDTOOut
+            {
+                Id = newProject.Id,
+                Title = newProject.Title,
+                Description = newProject.Description,
+                State = newProject.State,
+                Deadline = newProject.Deadline,
+                ProjectUsers = new List<PostProjectDTOOut.ProjectUserDTO>(newProjectUsers.Select(pu => new PostProjectDTOOut.ProjectUserDTO
+                {
+                    UserId = pu.UserId,
+                    ProjectId = pu.ProjectId,
+                }))
+            };
+
+            return CreatedAtAction("GetProject", new { id = newProject.Id }, projectDTO);
         }
 
         // DELETE: api/Projects/5

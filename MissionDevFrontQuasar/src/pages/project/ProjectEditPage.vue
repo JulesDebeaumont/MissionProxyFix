@@ -39,7 +39,7 @@ async function saveProject() {
   } as IProject;
   try {
     if (isEditMode.value) {
-      await api.patch(`Projects/${projectIdRef.value}`, projectPayload);
+      await api.put(`Projects/${projectIdRef.value}`, projectPayload);
     } else {
       const responsePostProject = await api.post('Projects', projectPayload);
       projectRef.value = responsePostProject.data as IProject;

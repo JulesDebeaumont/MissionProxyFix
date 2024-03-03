@@ -51,7 +51,6 @@ builder.Services.AddCors(options =>
     });
 
 
-
 var app = builder.Build();
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
@@ -84,7 +83,7 @@ app.MapControllers();
 app.Run();
 
 
-void EnsureSecretsAreDefined(IConfiguration config)
+static void EnsureSecretsAreDefined(IConfiguration config)
 {
     var secretsToCheck = new string[]
     {

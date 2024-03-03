@@ -20,22 +20,23 @@ namespace MissionDevBack.Controllers
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers([FromQuery]string fullnameSearch)
+        public async Task<ActionResult<IEnumerable<GetUsersDTOOut>>> GetUsers([FromQuery]string fullnameSearch)
         {
             if (fullnameSearch is null)
             {
                 return await _context.Users
-                .Select(u => new User
+                .Select(u => new GetUsersDTOOut
                 {
                     Id = u.Id,
                     Fullname = u.Fullname
                 })
+                .Take(20)
                 .ToListAsync();
             }
             else
             {
                 return await _context.Users
-                .Select(u => new User
+                .Select(u => new GetUsersDTOOut
                 {
                     Id = u.Id,
                     Fullname = u.Fullname
