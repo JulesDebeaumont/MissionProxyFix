@@ -110,7 +110,7 @@ namespace MissionDevBack.Controllers
             using (var memoryStream = new MemoryStream(responseService.Blob))
             {
                 var file = new FormFile(memoryStream, 0, responseService.Blob.Length, null, queryParams.Filename);
-                var responseWriteFile = await _storageService.WriteProjectFileToStorageAsync(file, queryParams.ProjectId);
+                var responseWriteFile = await _storageService.WriteProjectFileToStorageAsync(file, queryParams.ProjectId, User.Identity.Name);
                 foreach (var errorFile in responseWriteFile.Errors)
                 {
                     ModelState.AddModelError("File", errorFile);

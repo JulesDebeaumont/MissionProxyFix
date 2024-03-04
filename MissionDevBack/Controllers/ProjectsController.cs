@@ -32,11 +32,11 @@ namespace MissionDevBack.Controllers
                     Title = p.Title,
                     Deadline = p.Deadline,
                     State = p.State,
-                    Users = (ICollection<GetProjectsDTOOut.UserDTO>)p.ProjectUsers.Select(pu => new GetProjectsDTOOut.UserDTO
+                    Users = new List<GetProjectsDTOOut.UserDTO>(p.ProjectUsers.Select(pu => new GetProjectsDTOOut.UserDTO
                     {
                         Id = pu.User.Id,
                         Fullname = pu.User.Fullname
-                    })
+                    }))
                 })
                 .Skip(projectIndexParams.offset)
                 .Take(projectIndexParams.limit)
@@ -46,9 +46,24 @@ namespace MissionDevBack.Controllers
 
         // GET: api/Projects/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Project>> GetProject(int id)
+        public async Task<ActionResult<GetProjectDTOOut>> GetProject(int id)
         {
-            var project = await _context.Projects.FindAsync(id);
+            var project = await _context.Projects
+            .Where(p => p.Id == id)
+            .Select(p => new GetProjectDTOOut
+            {
+                Id = p.Id,
+                Title = p.Title,
+                Description = p.Description,
+                State = p.State,
+                Deadline = p.Deadline,
+                ProjectUsers = new List<GetProjectDTOOut.ProjectUserDTO>(p.ProjectUsers.Select(pu => new GetProjectDTOOut.ProjectUserDTO
+                {
+                    Id = pu.User.Id,
+                    Fullname = pu.User.Fullname
+                }))
+            })
+            .FirstOrDefaultAsync();
 
             if (project == null)
             {

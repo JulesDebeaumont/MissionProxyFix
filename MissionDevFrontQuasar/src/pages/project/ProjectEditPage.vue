@@ -60,11 +60,7 @@ async function getProjectById(projectId: string) {
   try {
     const responseProject = await api.get(`Projects/${projectId}`);
     projectRef.value = responseProject.data as IProject;
-    listOfUsersRef.value = (projectRef.value.projectUsers?.map(
-      (projectUserMap) => {
-        return projectUserMap.user;
-      }
-    ) ?? []) as IUser[];
+    listOfUsersRef.value = responseProject.data.projectUsers as IUser[];
   } catch (error) {
     console.error(error);
   } finally {

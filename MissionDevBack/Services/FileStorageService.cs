@@ -68,7 +68,7 @@ public class FileStorageService
         return responseWrite;
     }
 
-    public async Task<FileStorageEditFileResponse> WriteProjectFileToStorageAsync(IFormFile formfile, int projectId)
+    public async Task<FileStorageEditFileResponse> WriteProjectFileToStorageAsync(IFormFile formfile, int projectId, string userId)
     {
         var storageResponse = new FileStorageEditFileResponse();
         if (formfile.Length == 0)
@@ -100,7 +100,8 @@ public class FileStorageService
             Filename = Path.GetFileName(formfile.FileName),
             StorageFilename = randomFilename,
             CreatedAt = DateTime.Now,
-            MimeType = mimeType
+            MimeType = mimeType,
+            UserId = userId
         };
         _dbContext.ProjectFiles.Add(projectfile);
         await _dbContext.SaveChangesAsync();

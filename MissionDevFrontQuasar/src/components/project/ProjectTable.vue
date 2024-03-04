@@ -189,13 +189,13 @@ onMounted(async () => {
           </q-td>
           <q-td key="users">
             <q-chip
-              v-for="projectUser in props.row.projectUsers"
-              :key="projectUser.id"
+              v-for="user in props.row.users"
+              :key="user.id"
               color="info"
               text-color="white"
               size="sm"
             >
-              {{ projectUser.user.fullname }}
+              {{ user.fullname }}
             </q-chip>
           </q-td>
           <q-td key="actions" :props="props" class="q-gutter-x-sm">

@@ -45,11 +45,11 @@ export interface IUserFile {
   user?: IUser;
 }
 
-export interface IProjectFiler {
+export interface IProjectFile {
   id: number;
   filename: string;
   mimeType: string;
-  createAt: string;
+  createdAt: string;
   updatedAt: string;
   userId: number;
   user?: IUser;

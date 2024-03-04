@@ -22,10 +22,20 @@ namespace MissionDevBack.Controllers
         [HttpGet]
         public async Task<IActionResult> GetFiles()
         {
-            if (User.Identity.IsAuthenticated == false) {
+            if (User.Identity.IsAuthenticated == false)
+            {
                 return Unauthorized();
             }
-            var filesMeta = await _context.UserFiles.Where(uf => uf.UserId == User.Identity.Name).ToListAsync();
+            var filesMeta = await _context.UserFiles
+            .Where(uf => uf.UserId == User.Identity.Name)
+            .Select(uf => new GetUserFilesDTOOut
+            {
+                Id = uf.Id,
+                Filename = uf.Filename,
+                MimeType = uf.MimeType,
+                CreatedAt = uf.CreatedAt
+            })
+            .ToListAsync();
             return Ok(filesMeta);
         }
 
@@ -33,7 +43,8 @@ namespace MissionDevBack.Controllers
         [HttpPost("Upload")]
         public async Task<IActionResult> UploadFiles(UserFilesUploadFilesParams uploadFilesParams)
         {
-            if (User.Identity.IsAuthenticated == false) {
+            if (User.Identity.IsAuthenticated == false)
+            {
                 return Unauthorized();
             }
             if (uploadFilesParams.Files.Count == 0)

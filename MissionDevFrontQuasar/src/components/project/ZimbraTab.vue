@@ -18,20 +18,15 @@ const isLoadingAuthRef = ref(false);
 const isLoadingGetMailsRef = ref(false);
 const mailsPreviewRef = ref<IZimbraMailPreview[] | null>(null);
 const mailRef = ref<IZimbraMail | null>(null);
-const emailInputRef = ref('jdebeaumont@chu-reims.fr');
 const passwordInputRef = ref('');
 
 // functions
 async function getZimbraAuthToken() {
   isLoadingAuthRef.value = true;
   try {
-    const responseZimbraCrsf = await api.post(
-      `projects/${propsComponent.projectId}/GetZimbraAuthToken`,
-      {
-        email: emailInputRef.value,
-        password: passwordInputRef.value,
-      }
-    );
+    const responseZimbraCrsf = await api.post(`MailBox/GetAuthToken`, {
+      password: passwordInputRef.value,
+    });
     userStore.setupZimbraAuthToken(responseZimbraCrsf.data as string);
   } catch (error) {
     console.log(error);
@@ -42,14 +37,11 @@ async function getZimbraAuthToken() {
 async function getZimbraMailByFolder(folderName: string) {
   isLoadingGetMailsRef.value = true;
   try {
-    const responseZimbraEmailPreview = await api.post(
-      `projects/${propsComponent.projectId}/GetZimbraMailsByFolder`,
-      {
-        FolderName: folderName,
-        MailCount: 100,
-        AuthToken: userStore.getZimbraAuthTokenInCookie,
-      }
-    );
+    const responseZimbraEmailPreview = await api.post(`GetMailsByFolder`, {
+      FolderName: folderName,
+      MailCount: 100,
+      AuthToken: userStore.getZimbraAuthTokenInCookie,
+    });
     mailsPreviewRef.value =
       responseZimbraEmailPreview.data as IZimbraMailPreview[];
   } catch (error) {
@@ -60,13 +52,10 @@ async function getZimbraMailByFolder(folderName: string) {
 }
 async function getZimbraMailById(mailId: string) {
   try {
-    const responseZimbraEmailPreview = await api.post(
-      `projects/${propsComponent.projectId}/GetZimbraMailById`,
-      {
-        mailId,
-        AuthToken: userStore.getZimbraAuthTokenInCookie,
-      }
-    );
+    const responseZimbraEmailPreview = await api.post(`GetMailById`, {
+      mailId,
+      AuthToken: userStore.getZimbraAuthTokenInCookie,
+    });
     mailRef.value = responseZimbraEmailPreview.data as IZimbraMail;
   } catch (error) {
     console.log(error);
@@ -150,7 +139,6 @@ const htmlMail = computed(() => {
 </script>
 
 <template>
-  <q-input label="Email" v-model="emailInputRef" />
   <q-input label="Password" v-model="passwordInputRef" />
 
   <q-btn @click="getZimbraAuthToken" label="Zimbra Auth !" color="primary" />
