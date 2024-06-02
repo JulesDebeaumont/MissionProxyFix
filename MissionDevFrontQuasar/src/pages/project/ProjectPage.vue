@@ -9,15 +9,16 @@ import {
   displayProjectState,
   getColorClassByProjectState,
 } from 'src/utils/project';
+import { useUserStore } from 'src/stores/user-store';
 // components
 import ZimbraTab from 'src/components/project/ZimbraTab.vue';
-import SketchTab from 'src/components/project/sketch/SketchTab.vue';
 import ProjectFiles from 'src/components/project/ProjectFiles.vue';
 import DelayedCard from 'src/components/global/DelayedCard.vue';
 
 // consts
 const route = useRoute();
 const router = useRouter();
+const userStore = useUserStore();
 const projectId = route.params.projectId as string;
 const applicationTab: QTabProps[] = [
   {
@@ -185,7 +186,8 @@ onMounted(async () => {
             </q-tab-panel>
 
             <q-tab-panel :name="applicationTab[2].name">
-              <SketchTab :project-id="projectId" />
+              <div>THANK YOU {{ userStore.userFullName }}!</div>
+              <div>BUT OUR SKETCHES IS IN ANOTHER CASTLE!</div>
             </q-tab-panel>
           </q-tab-panels>
         </q-intersection>

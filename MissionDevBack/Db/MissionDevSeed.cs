@@ -16,8 +16,19 @@ public static class MissionDevSeed
 
         // Users
         context.Users.ExecuteDelete();
-        var user1 = new User() { Fullname = "Jules Debeaumont", UserName = "JulesD", IdRes = "", Roles = [EUserRoles.Admin, EUserRoles.Worker], Email="jdebeaumont@chu-reims.fr" };
-        var user2 = new User() { Fullname = "Brian Bertili", UserName = "BrianB", IdRes = "", Roles = [EUserRoles.Worker] };
+        var user1 = new User() { 
+            Fullname = "Jules Debeaumont",
+            UserName = "JulesD", 
+            IdRes = "", 
+            Roles = [EUserRoles.Admin, EUserRoles.Worker], 
+            Email = "jdebeaumont@chu-reims.fr"
+        };
+        var user2 = new User() { 
+            Fullname = "Brian Bertili", 
+            UserName = "BrianB", 
+            IdRes = "", 
+            Roles = [EUserRoles.Worker] 
+        };
         var users = new User[]
            {
                 user1,

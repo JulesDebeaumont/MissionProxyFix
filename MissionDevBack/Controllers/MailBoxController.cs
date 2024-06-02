@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MimeTypes;
 using MissionDevBack.Db;
 using MissionDevBack.Models;
@@ -6,7 +7,7 @@ using MissionDevBack.Services;
 
 namespace MissionDevBack.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/MailBox")]
     [ApiController]
     public class MailBoxController : ControllerBase
     {
@@ -23,15 +24,19 @@ namespace MissionDevBack.Controllers
 
         // POST: api/MailBox/GetAuthToken
         [HttpPost("GetAuthToken")]
-        public async Task<IActionResult> GetAuthToken(int id, [FromBody] ProjectGetZimbraAuthParams bodyParams)
+        public async Task<IActionResult> GetAuthToken([FromBody] ProjectGetZimbraAuthParams bodyParams)
         {
-            var project = await _context.Projects.FindAsync(id);
-            if (project == null)
+            var userMail = await _context.Users
+            .Where(u => u.Id == User.Identity.Name)
+            .Select(u => u.Email)
+            .FirstOrDefaultAsync();
+
+            if (userMail is null)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            var responseService = await _mailService.GetMailBoxAuthToken(bodyParams.email, bodyParams.password);
+            var responseService = await _mailService.GetMailBoxAuthToken(userMail, bodyParams.Password);
             if (!responseService.IsSuccess)
             {
                 return BadRequest(responseService.Errors);
@@ -41,17 +46,20 @@ namespace MissionDevBack.Controllers
         }
 
 
-        // POST: api/MailBox/GetMailsByFolder
-        [HttpPost("GetMailsByFolder")]
-        public async Task<IActionResult> GetMailsByFolder(int id, [FromBody] ProjectGetZimbraLastMails bodyParams)
+        // POST: api/MailBox/GetMails
+        [HttpPost("GetMails")]
+        public async Task<IActionResult> GetMails([FromBody] ProjectGetZimbraLastMails bodyParams)
         {
-            var project = await _context.Projects.FindAsync(id);
-            if (project == null)
+            var projectUser = await _context.ProjectUsers
+            .Where(pu => pu.ProjectId == bodyParams.ProjectId && pu.UserId == User.Identity.Name)
+            .FirstOrDefaultAsync();
+
+            if (projectUser.MailFolderName is null)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            var responseService = await _mailService.GetLastMailsByFolderName(bodyParams.FolderName, bodyParams.MailCount, bodyParams.AuthToken);
+            var responseService = await _mailService.GetLastMailsByFolderName(projectUser.MailFolderName, bodyParams.MailCount, bodyParams.AuthToken);
             if (!responseService.IsSuccess)
             {
                 return BadRequest(responseService.Errors);
@@ -60,16 +68,11 @@ namespace MissionDevBack.Controllers
             return Ok(responseService.MailPreviews);
         }
 
+
         // POST: api/MailBox/GetMailById
         [HttpPost("GetMailById")]
         public async Task<IActionResult> GetMailById(int id, [FromBody] ProjectGetZimbraMail bodyParams)
         {
-            var project = await _context.Projects.FindAsync(id);
-            if (project == null)
-            {
-                return NotFound();
-            }
-
             var responseService = await _mailService.GetMailById(bodyParams.MailId, bodyParams.AuthToken);
             if (!responseService.IsSuccess)
             {
@@ -78,6 +81,7 @@ namespace MissionDevBack.Controllers
 
             return Ok(responseService.Mail);
         }
+
 
         // POST: api/MailBox/GetAttachment
         [HttpGet("GetAttachment")]
@@ -91,6 +95,7 @@ namespace MissionDevBack.Controllers
 
             return File(responseService.Blob, MimeTypeMap.GetMimeType(queryParams.Filename));
         }
+
 
         // POST: api/MailBox/TransfertAttachmentToProject
         [HttpGet("TransfertAttachmentToProject")]

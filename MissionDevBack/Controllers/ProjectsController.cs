@@ -183,6 +183,48 @@ namespace MissionDevBack.Controllers
             return NoContent();
         }
 
+        // GET: api/Projects/5/GetFolderName
+        [HttpGet("{id}/GetFolderName")]
+        public async Task<IActionResult> GetUserFolder(int id)
+        {
+            var projectUser = await _context.ProjectUsers
+            .Where(pu => pu.UserId == User.Identity.Name && pu.ProjectId == id)
+            .Select(pu => new GetUserFolderDTOOut
+            {
+                UserId=pu.UserId,
+                MailFolderName=pu.MailFolderName
+            })
+            .FirstOrDefaultAsync();
+
+            if (projectUser is null) 
+            {
+                return NotFound();
+            }
+
+            return Ok(projectUser);
+        }
+
+        // PUT: api/Projects/5/SetFolderName
+        [HttpPut("{id}/SetFolderName")]
+        public async Task<IActionResult> SetFolderName(int id, SetFolderNameDTOIn bodyParams)
+        {
+            var projectUser = await _context.ProjectUsers
+            .Where(pu => pu.UserId == User.Identity.Name && pu.ProjectId == id)
+            .FirstOrDefaultAsync();
+
+            if (projectUser is null)
+            {
+                return NotFound();
+            }
+
+            projectUser.MailFolderName = bodyParams.FolderName;
+
+            _context.Entry(projectUser).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            
+            return Ok();
+        }
+
         private bool ProjectExists(int id)
         {
             return _context.Projects.Any(e => e.Id == id);
